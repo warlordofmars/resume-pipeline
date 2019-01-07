@@ -15,7 +15,7 @@ pipeline {
         }
         stage('analyze') {
           steps {
-            sh './gradlew analyze'
+            sh './gradlew analyze --info'
           }
         }
       }
