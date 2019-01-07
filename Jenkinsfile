@@ -7,9 +7,17 @@ pipeline {
       }
     }
     stage('build') {
-      steps {
-        sh './gradlew build'
-        sh './gradlew analyze'
+      parallel {
+        stage('build') {
+          steps {
+            sh './gradlew build'
+          }
+        }
+        stage('analyze') {
+          steps {
+            sh './gradlew analyze'
+          }
+        }
       }
     }
     stage('print') {
