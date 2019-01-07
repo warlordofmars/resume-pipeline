@@ -27,12 +27,8 @@ pipeline {
       when {
         branch 'master'
       }
-      input {
-          message "Does it look ok?"
-          ok "Yes, looks good.  Lets continue."
-      }
       steps  {
-        echo 'Continuing on to deploy and final printing'
+        input 'Does it look ok?'
       }
 
     }
