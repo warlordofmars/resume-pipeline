@@ -25,7 +25,7 @@ pipeline {
     
     stage('continue') {
       when {
-        branch 'master'
+        branch 'cleanup'
       }
       steps  {
         input 'Does it look ok?'
@@ -34,7 +34,7 @@ pipeline {
     }
     stage('deploy') {
       when {
-        branch 'master'
+        branch 'cleanup'
       }
       steps {
         sh 'echo deploy'
@@ -42,7 +42,7 @@ pipeline {
     }
     stage('print-final') {
       when {
-        branch 'master'
+        branch 'cleanup'
       }
       steps {
         sh './gradlew print'
