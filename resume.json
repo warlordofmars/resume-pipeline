@@ -2,10 +2,10 @@
   "basics": {
     "name": "John A. Carter",
     "label": "Systems Administrator",
-    "picture": "",
+    "picture": "http://www.datacenterknowledge.com/wp-content/uploads/2011/04/prineville-servers-1000.jpg",
     "email": "johncarter@warlordofmars.net",
     "phone": "(770) 598-7096",
-    "summary": "An experienced and accomplished Systems Administrator, with a background in software development, that has demonstrated a strong passion for automation and innovation of all facets related to the software development life-cycle and all underlying infrastructure required.  Looking for a position that would leverage principles from software development, traditional systems administration, and other principles under the DevOps umbrella, in order to contribute to, and improve, an overall customer value chain of an organization that shares some of the same passion.",
+    "summary": "An experienced and accomplished Systems Administrator, with a background in software development, that has demonstrated a strong passion for automation and innovation of all facets related to the software development life-cycle and all underlying infrastructure required.  Looking for a position that would leverage principles from software development, traditional systems administration, and other principles under the DevOps umbrella, in order to contribute to, and improve, an overall customer value chain of an organization that shares the same passion.",
     "location": {
       "address": "42 Chauncy Street Apt 5C",
       "postalCode": "MA 02111",
@@ -32,7 +32,10 @@
         "Implemented a custom Puppet ENC that defined all nodes and what was to be installed on each node",
         "Developed a custom application that served as global repository of aggregated information about all infrastructure elements (servers, virtual machines, storage, databases, networks, etc.), dynamically populated by what is actually in the environment",
         "Implemented Kanban style workflow for Infrastructure Team which include specific checkpoints for elaboration and documentation",
-        "Developed repeatable pattern for automation of all internally developed applications"
+        "Developed repeatable pattern for automation of all internally developed applications",
+        "Highly optimized NetApp filers for optimal performance of high-load Oracle databases",
+        "Provided in-depth monitoring of all aspects of the infrastructure via OMD (Check MK / Nagios)",
+        "Developed custom sythetic-transaction-style monitoring checks that accurately simulated what a real user would be doing"
       ]
     },
     {
@@ -49,6 +52,7 @@
         "Led development effort of a visitor profiling and engagement engine, used by Amtrak.com",
         "Led development effort of real estate web marketing application",
         "Led development effort of social network email client application",
+        "Led development and maintenance of legacy applications",
         "Architected and implemented a complete private cloud infrastructure utilizing Dell Servers and Storage, and XenServer",
         "Migrated all legacy applications and physical servers to private cloud infrastructure",
         "Developed custom automated build / release processes",
@@ -107,8 +111,8 @@
         "HTML",
         "CSS",
         "Javascript",
-        "PHP",
-        "Python"
+        "PHP / CodeIgniter",
+        "Python / Django"
       ]
     },
     {
@@ -116,7 +120,8 @@
       "keywords": [
         "bash",
         "PHP",
-        "Python"
+        "Python",
+        "PowerShell"
       ]
     },
     {
@@ -124,10 +129,76 @@
         "keywords": [
             "git",
             "subversion",
+            "rpm / yum",
             "Jenkins",
             "Maven / Artifactory",
             "Ant",
             "Fabric"
+        ]
+    },
+    {
+        "name": "Storage",
+        "keywords": [
+            "NetApp"
+        ]
+    },
+    {
+        "name": "Virtualization",
+        "keywords": [
+            "VMware vSphere",
+            "Citrix XenServer",
+            "AWS EC2"
+        ]
+    },
+    {
+        "name": "Databases",
+        "keywords": [
+            "MySQL",
+            "PostgreSQL",
+            "Oracle",
+            "Mongo",
+            "Elasticsearch"
+        ]
+    },
+    {
+        "name": "Monitoring",
+        "keywords": [
+            "Nagios",
+            "Check MK",
+            "OMD",
+            "graphite",
+            "logstash"
+        ]
+    },
+    {
+        "name": "Server Platforms",
+        "keywords": [
+            "Linux (RHEL, CentOS, Debian)",
+            "Windows Server",
+            "ESXi"
+        ]
+    },
+    {
+        "name": "Application Servers",
+        "keywords": [
+            "JBoss",
+            "Tomcat",
+            "WebLogic",
+            "Apache httpd / mod_wsgi"
+        ]
+    },
+    {
+        "name": "Load Balancers",
+        "keywords": [
+            "f5 BIG-IP"
+        ]
+    },
+    {
+        "name": "Applications",
+        "keywords": [
+            "Office365 / dirsync / ADFS",
+            "ServiceNow"
+
         ]
     }
   ],
