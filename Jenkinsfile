@@ -31,6 +31,10 @@ pipeline {
           message "Does it look ok?"
           ok "Yes, looks good.  Lets continue."
       }
+      steps  {
+        echo 'Continuing on to deploy and final printing'
+      }
+
     }
     stage('deploy') {
       when {
