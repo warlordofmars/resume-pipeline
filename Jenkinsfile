@@ -4,27 +4,11 @@ pipeline {
     
     stage('build') {
       
-      stages {
-        stage('validate JSON syntax/schema') {
-          steps {
-            sh './gradlew validate'
-          }
-        }
-        stage('build resume pdf') {
-          steps {
-            sh './gradlew build'
-          }
-        }
-        stage('build resume html') {
-          steps {
-            sh './gradlew build'
-          }
-        }
-        stage('analyze resume') {
-          steps {
-            sh './gradlew analyze'
-          }
-        }
+      steps {
+        sh './gradlew validate'
+        sh './gradlew build'
+        sh './gradlew build'
+        sh './gradlew analyze'
       }
       
     }
