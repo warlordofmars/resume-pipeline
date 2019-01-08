@@ -3,12 +3,13 @@ pipeline {
   stages {
     
     stage('build') {
-      stage('validate JSON syntax/schema') {
-        steps {
-          sh './gradlew validate'
-        }
-      }
+      
       stages {
+        stage('validate JSON syntax/schema') {
+          steps {
+            sh './gradlew validate'
+          }
+        }
         stage('build resume pdf') {
           steps {
             sh './gradlew build'
