@@ -1,16 +1,31 @@
 pipeline {
   agent any
   stages {
-    stage('validate') {
-      steps {
-        sh './gradlew validate'
-      }
-    }
+    
     stage('build') {
-      steps {
-        sh './gradlew build'
-        sh './gradlew analyze'
+      stage('validate JSON syntax/schema') {
+        steps {
+          sh './gradlew validate'
+        }
       }
+      stages {
+        stage('build resume pdf') {
+          steps {
+            sh './gradlew build'
+          }
+        }
+        stage('build resume html') {
+          steps {
+            sh './gradlew build'
+          }
+        }
+        stage('analyze resume') {
+          steps {
+            sh './gradlew analyze'
+          }
+        }
+      }
+      
     }
     stage('stage-deploy') {
       steps {
