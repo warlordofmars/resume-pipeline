@@ -22,7 +22,7 @@ pipeline {
       }
     }
 
-    stage('test') {
+    stage('deploy') {
       when {
         branch 'master'
       }
