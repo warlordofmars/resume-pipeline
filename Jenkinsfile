@@ -12,41 +12,25 @@ pipeline {
       }
       
     }
-    stage('stage-deploy') {
-      steps {
-        sh 'echo deploy'
-      }
-    }
-    stage('print-sample') {
-      steps {
-        sh './gradlew print'
-      }
-    }
-    
-    stage('continue') {
-      when {
-        branch 'cleanup'
-      }
-      steps  {
-        input 'Does it look ok?'
-      }
 
+    stage('test') {
+      steps {
+        sh './gradlew deploy'
+        sh './gradlew print'
+        input 'How does https://resume-test.warlordofmars.net look?'
+        input 'How does printed sample resume look?'
+      }
     }
-    stage('deploy') {
+
+    stage('test') {
       when {
-        branch 'cleanup'
+        branch 'master'
       }
       steps {
-        sh 'echo deploy'
-      }
-    }
-    stage('print-final') {
-      when {
-        branch 'cleanup'
-      }
-      steps {
+        sh './gradlew deploy'
         sh './gradlew print'
       }
     }
+
   }
 }

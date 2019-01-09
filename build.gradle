@@ -5,6 +5,47 @@
  * Learn how to create Gradle builds at https://guides.gradle.org/creating-new-gradle-builds/
  */
 
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath "jp.classmethod.aws:gradle-aws-plugin:0.30"
+        classpath "javax.xml.bind:jaxb-api:2.3.0"
+    }
+}
+
+ext {
+    cloudformationBucket = 'warlordofmars-cloudformation'
+}
+
+
+apply plugin: 'jp.classmethod.aws.cloudformation'
+
+cloudFormation {
+    stackName "resume-website"
+    templateFile file("resume_website/resume.warlordofmars.net.yaml")
+    templateBucket cloudformationBucket
+    templateKeyPrefix "resume-website"
+    stackParams ([
+        'DomainName': "warlordofmars.net",
+        'FullDomainName': "resume-test.warlordofmars.net",
+        'AcmCertificateArn': "arn:aws:acm:us-east-1:247631471946:certificate/471106fc-e3dd-4e0b-a20f-010a6e326283"
+    ])
+}
+
+task('deployStack') {
+    dependsOn awsCfnMigrateStackAndWaitCompleted
+}
+
+task('deleteStack') {
+    dependsOn awsCfnDeleteStackAndWaitCompleted
+}
+
+awsCfnMigrateStack.dependsOn awsCfnUploadTemplate
+
 task('build') {
     doFirst {
         exec {
@@ -34,6 +75,16 @@ task('print') {
     doFirst {
         exec {
             commandLine 'lp', 'out/resume.pdf'
+        }
+    }
+}
+
+task('deploy') {
+    mustRunAfter build
+    dependsOn deployStack
+    doFirst {
+        exec {
+            commandLine 'aws', 's3', 'cp', 'out/resume.html', 's3://resume-test.warlordofmars.net/index.html'
         }
     }
 }
