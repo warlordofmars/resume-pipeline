@@ -23,7 +23,7 @@ ext {
     prodWebsiteUrl = 'resume.warlordofmars.net'
     testStackName = "ResumeWebsiteTest"
     prodStackName = 'ResumeWebsite'
-    cloudformationSource = 'resume_website/resume_website.yaml'
+    cloudformationSource = 'website.yaml'
     domainName = 'warlordofmars.net'
     wildcardCertARN = "arn:aws:acm:us-east-1:247631471946:certificate/471106fc-e3dd-4e0b-a20f-010a6e326283"
     productionBranch = 'master'
@@ -66,74 +66,3 @@ def getHtmlResumeName() {
 
 ext.stackName = getStackName()
 ext.websiteUrl = getWebsiteUrl()
-
-afterEvaluate {
-
-    apply plugin: 'jp.classmethod.aws.cloudformation'
-    
-    cloudFormation {
-        stackName "${project.ext.stackName}"
-        templateFile file(cloudformationSource)
-        templateBucket cloudformationBucket
-        templateKeyPrefix stackName
-        stackParams ([
-            'DomainName': domainName,
-            'FullDomainName': websiteUrl,
-            'AcmCertificateArn': wildcardCertARN
-        ])
-    }
-
-    task('deployStack') {
-        dependsOn awsCfnMigrateStackAndWaitCompleted
-    }
-
-    task('deleteStack') {
-        dependsOn awsCfnDeleteStackAndWaitCompleted
-    }
-
-    awsCfnMigrateStack.dependsOn awsCfnUploadTemplate
-
-    task('build') {
-        doFirst {
-            exec {
-                commandLine 'hackmyresume', 'build', 'resume/resume.json', 'TO', 'out/resume.all', '-t', 'resume_theme/node_modules/jsonresume-theme-short/'
-            }
-        }
-    }
-
-    task('analyze') {
-        doFirst {
-            exec {
-                commandLine 'hackmyresume', 'analyze', 'resume/resume.json'
-            }
-        }
-    }
-
-    task('validate') {
-        doFirst {
-            exec {
-                commandLine 'hackmyresume', 'validate', 'resume/resume.json'
-            }
-        }
-    }
-
-    task('print') {
-        mustRunAfter build
-        doFirst {
-            exec {
-                commandLine 'lp', 'out/resume.pdf'
-            }
-        }
-    }
-
-    task('deploy') {
-        mustRunAfter build
-        dependsOn deployStack
-        doFirst {
-
-            exec {
-                commandLine 'aws', 's3', 'cp', 'out/resume.html', "s3://${getWebsiteUrl()}/${getHtmlResumeName()}"
-            }
-        }
-    }
-}

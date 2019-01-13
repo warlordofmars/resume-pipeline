@@ -1,0 +1,43 @@
+apply plugin: 'jp.classmethod.aws.cloudformation'
+    
+cloudFormation {
+    stackName "${rootProject.ext.stackName}"
+    templateFile file(cloudformationSource)
+    templateBucket cloudformationBucket
+    templateKeyPrefix stackName
+    stackParams ([
+        'DomainName': domainName,
+        'FullDomainName': websiteUrl,
+        'AcmCertificateArn': wildcardCertARN
+    ])
+}
+
+task('deploy') {
+    dependsOn awsCfnMigrateStackAndWaitCompleted
+}
+
+task('delete') {
+    dependsOn awsCfnDeleteStackAndWaitCompleted
+}
+
+awsCfnMigrateStack.dependsOn awsCfnUploadTemplate
+
+task('cfnLint') {
+    doFirst {
+        exec {
+            commandLine 'cfn-lint', cloudformationSource
+        }
+    }
+}
+
+task('cfnNag') {
+    doFirst {
+        exec {
+            commandLine 'cfn_nag_scan', '--input-path', cloudformationSource
+        }
+    }
+}
+
+task('build') {
+    dependsOn cfnLint, cfnNag
+}

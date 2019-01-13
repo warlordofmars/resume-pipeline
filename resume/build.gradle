@@ -1,0 +1,53 @@
+task('build') {
+    doFirst {
+        exec {
+            commandLine 'hackmyresume', 'build', 'resume.json', 'TO', 'out/resume.all', '-t', 'theme/node_modules/jsonresume-theme-short/'
+        }
+    }
+}
+
+task('analyze') {
+    doFirst {
+        exec {
+            commandLine 'hackmyresume', 'analyze', 'resume/resume.json'
+        }
+    }
+}
+
+task('validate') {
+    doFirst {
+        exec {
+            commandLine 'hackmyresume', 'validate', 'resume/resume.json'
+        }
+    }
+}
+
+task('print') {
+    mustRunAfter build
+    doFirst {
+        exec {
+            commandLine 'lp', 'out/resume.pdf'
+        }
+    }
+}
+
+task('deploy') {
+    mustRunAfter build
+    // dependsOn deployStack
+    doFirst {
+
+        exec {
+            commandLine 'aws', 's3', 'cp', 'out/resume.html', "s3://${getWebsiteUrl()}/${getHtmlResumeName()}"
+        }
+
+        exec {
+            commandLine 'open', "https://${getWebsiteUrl()}/${getHtmlResumeName()}"
+        }
+
+        exec {
+            commandLine 'say', "Take a look at the preview résumé now"
+        }
+    }
+}
+
+deploy.dependsOn(':website:deploy')
