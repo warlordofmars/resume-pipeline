@@ -17,7 +17,7 @@ task('analyze') {
 task('validate') {
     doFirst {
         exec {
-            commandLine 'hackmyresume', 'validate', 'resume/resume.json'
+            commandLine 'hackmyresume', 'validate', 'resume.json'
         }
     }
 }
