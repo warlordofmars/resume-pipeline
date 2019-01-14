@@ -1,7 +1,7 @@
 task('build') {
     doFirst {
         exec {
-            commandLine 'hackmyresume', 'build', 'resume.json', 'TO', 'out/resume.all', '-t', 'theme/node_modules/jsonresume-theme-short/'
+            commandLine 'hackmyresume', 'build', 'resume.json', 'TO', 'build/resume.all', '-t', 'theme/node_modules/jsonresume-theme-short/'
         }
     }
 }
@@ -26,7 +26,7 @@ task('print') {
     mustRunAfter build
     doFirst {
         exec {
-            commandLine 'lp', 'out/resume.pdf'
+            commandLine 'lp', 'build/resume.pdf'
         }
     }
 }
@@ -37,7 +37,7 @@ task('deploy') {
     doFirst {
 
         exec {
-            commandLine 'aws', 's3', 'cp', 'out/resume.html', "s3://${getWebsiteUrl()}/${getHtmlResumeName()}"
+            commandLine 'aws', 's3', 'cp', 'build/resume.html', "s3://${getWebsiteUrl()}/${getHtmlResumeName()}"
         }
 
         exec {
