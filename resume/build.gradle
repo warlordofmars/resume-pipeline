@@ -9,7 +9,7 @@ task('build') {
 task('analyze') {
     doFirst {
         exec {
-            commandLine 'hackmyresume', 'analyze', 'resume/resume.json'
+            commandLine 'hackmyresume', 'analyze', 'resume.json'
         }
     }
 }
