@@ -30,20 +30,6 @@ task('spellCheck') {
     }
 }
 
-task('analyzeResume') {
-    mustRunAfter validateResume, spellCheck
-    doFirst {
-        def out = new ByteArrayOutputStream()
-        exec {
-            commandLine 'hackmyresume', 'analyze', 'resume.json'
-            standardOutput out
-        }
-        def report = out.toString()
-        file("${buildDir}/resume-analysis.txt").text = report
-        println report
-    }
-}
-
 task('checkUrls') {
     mustRunAfter validateResume
     doFirst {
@@ -69,6 +55,20 @@ task('buildPdfResume') {
     mustRunAfter validateResume, spellCheck, checkUrls
     doFirst {
         buildResume('pdf', pdfResumeTheme)
+    }
+}
+
+task('analyzeResume') {
+    mustRunAfter validateResume, spellCheck, buildHtmlResume
+    doFirst {
+        def out = new ByteArrayOutputStream()
+        exec {
+            commandLine 'hackmyresume', 'analyze', 'resume.json'
+            standardOutput out
+        }
+        def report = out.toString()
+        file("${buildDir}/resume-analysis.txt").text = report
+        println report
     }
 }
 
