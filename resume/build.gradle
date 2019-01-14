@@ -5,14 +5,6 @@ def buildResume(format, theme) {
     }
 }
 
-task('analyzeResume') {
-    doFirst {
-        exec {
-            commandLine 'hackmyresume', 'analyze', 'resume.json'
-        }
-    }
-}
-
 task('validateResume') {
     doFirst {
         exec {
@@ -21,50 +13,117 @@ task('validateResume') {
     }
 }
 
-task('buildHtmlResume') {
+task('spellCheck') {
     mustRunAfter validateResume
     doFirst {
-        buildResume('html', 'theme/node_modules/jsonresume-theme-short/')
+        def out = new ByteArrayOutputStream()
+        exec {
+            commandLine 'aspell', 'list', '-t', '--home-dir=.', '--personal=spell_check_ignore.txt'
+            standardInput new ByteArrayInputStream(file('resume.json').text.getBytes())
+            standardOutput out
+        }
+        def errors = out.toString().readLines()
+        if (errors.size() > 0) {
+            throw new GradleException("There were ${errors.size()} words misspelled in resume.json:\n\n${errors}")
+        }
+        println "No spelling errors detected in resume.json"
+    }
+}
+
+task('analyzeResume') {
+    mustRunAfter validateResume, spellCheck
+    doFirst {
+        def out = new ByteArrayOutputStream()
+        exec {
+            commandLine 'hackmyresume', 'analyze', 'resume.json'
+            standardOutput out
+        }
+        def report = out.toString()
+        file("${buildDir}/resume-analysis.txt").text = report
+        println report
+    }
+}
+
+task('checkUrls') {
+    mustRunAfter validateResume
+    doFirst {
+        def URLs = file('resume.json').text.findAll('http[s]?://[a-zA-Z0-9./-]+')
+        URLs.each { detectedURL ->
+            if (!detectedURL.toURL()) {
+                raise new GradleException("Could not connect to ${detectedURL} found in resume.json")
+            } else {
+                println "Found the URL ${detectedURL} in resume.json and it is currently a live link."
+            }
+        }
+    }
+}
+
+task('buildHtmlResume') {
+    mustRunAfter validateResume, spellCheck, checkUrls
+    doFirst {
+        buildResume('html', htmlResumeTheme)
     }
 }
 
 task('buildPdfResume') {
-    mustRunAfter validateResume
+    mustRunAfter validateResume, spellCheck, checkUrls
     doFirst {
-        buildResume('pdf', 'theme/node_modules/jsonresume-theme-short/')
+        buildResume('pdf', pdfResumeTheme)
     }
 }
 
+task('clean', type:Delete) {
+    delete buildDir
+}
+
 task('build') {
-    dependsOn validateResume, analyzeResume, buildHtmlResume, buildPdfResume
+    dependsOn validateResume, spellCheck, checkUrls, analyzeResume, buildHtmlResume, buildPdfResume
 }
 
 task('print') {
     mustRunAfter build
     doFirst {
         exec {
-            commandLine 'lp', 'build/resume.pdf'
+            commandLine 'lp', "${buildDir}/resume.pdf"
         }
     }
 }
 
-task('deploy') {
+task('publishResume') {
     mustRunAfter build
     // dependsOn deployStack
     doFirst {
 
         exec {
-            commandLine 'aws', 's3', 'cp', 'build/resume.html', "s3://${getWebsiteUrl()}/${getHtmlResumeName()}"
+            commandLine 'aws', 's3', 'cp', "${buildDir}/resume.html", "s3://${getWebsiteUrl()}/${getHtmlResumeName()}"
         }
 
-        exec {
-            commandLine 'open', "https://${getWebsiteUrl()}/${getHtmlResumeName()}"
-        }
+        // exec {
+        //     commandLine 'open', "https://${getWebsiteUrl()}/${getHtmlResumeName()}"
+        // }
 
-        exec {
-            commandLine 'say', "Take a look at the preview résumé now"
-        }
+        // exec {
+        //     commandLine 'say', "Take a look at the preview résumé now"
+        // }
     }
 }
 
-deploy.dependsOn(':website:deploy')
+
+task('postDeployCheck') {
+    mustRunAfter publishResume
+    doFirst {
+        def deployURL = "https://${getWebsiteUrl()}/${getHtmlResumeName()}"
+        def content = deployURL.toURL().text
+        ensureStrings.each { word ->
+            if (!content.contains(word)) {
+                throw new GradleException("The ensure string \"${word}\" was not found in ${deployURL}")
+            }
+        }
+        println "\nThe resume is confirmed to be published to ${deployURL} successfully, and can now be accessed at that URL.\n\nThe resume contains the following key strings we were looking for:\n\n${ensureStrings}\n"
+    }
+}
+
+task('deploy') {
+    dependsOn ':website:deploy', publishResume, postDeployCheck
+}
+

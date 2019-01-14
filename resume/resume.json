@@ -25,7 +25,7 @@
         "Architected and implemented a complete private cloud infrastructure utilizing HP Servers, NetApp Storage, and VMware",
         "Migrated all legacy applications and physical servers to private cloud infrastructure",
         "Provided lead infrastructure support in effort involving transitioning off of mainframe-based application to more modern application framework hosted in private cloud infrastructure",
-        "Developed enterprise-level job scheduler resposnible for stuff",
+        "Developed enterprise-level job scheduler responsible for stuff",
         "Developed infrastructure dashboards for executives providing real time stats and uptime",
         "Developed automated workflow for release of new builds to dev/test/stage/prod",
         "Implemented configuration management throughout the environment using Puppet",
@@ -35,7 +35,7 @@
         "Developed repeatable pattern for automation of all internally developed applications",
         "Highly optimized NetApp filers for optimal performance of high-load Oracle databases",
         "Provided in-depth monitoring of all aspects of the infrastructure via OMD (Check MK / Nagios)",
-        "Developed custom sythetic-transaction-style monitoring checks that accurately simulated what a real user would be doing"
+        "Developed custom synthetic-transaction-style monitoring checks that accurately simulated what a real user would be doing"
       ]
     },
     {
@@ -70,7 +70,7 @@
       "highlights": [
         "Managed Cisco router with load balanced T1's for office connectivity and server hosting",
         "Migrated servers from local hosting to managed hosting provider",
-        "Defined and implemented standardized installation and configuration guidlines for all servers in environment",
+        "Defined and implemented standardized installation and configuration guidelines for all servers in environment",
         "Automated provisioning of new accounts"
 
       ]

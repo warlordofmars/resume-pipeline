@@ -2,6 +2,7 @@
  * resume/build.gradle
  */
 
+import java.util.Random
 
 buildscript {
     repositories {
@@ -24,15 +25,18 @@ ext {
     domainName = 'warlordofmars.net'
     wildcardCertARN = "arn:aws:acm:us-east-1:247631471946:certificate/471106fc-e3dd-4e0b-a20f-010a6e326283"
     productionBranch = 'master'
-    
-    
+    ensureStrings = ['John A. Carter', 'johncarter@warlordofmars.net', '(770) 598-7096']
+    htmlResumeTheme = 'theme/node_modules/jsonresume-theme-class/'
+    pdfResumeTheme = 'theme/node_modules/jsonresume-theme-short/'
 }
 
 if (!project.hasProperty('previewHtmlFileName')) {
-    ext.previewHtmlFileName = 'resume-preview.html'
+    def random = new Random()
+    def randomNumber = random.nextInt() & Integer.MAX_VALUE
+    ext.previewHtmlFileName = "resume-preview-${randomNumber}.html"
 }
 
-if (!project.hasProperty('previewHtmlFileName')) {
+if (!project.hasProperty('productionHtmlFileName')) {
     ext.productionHtmlFileName = 'index.html'
 }
 
