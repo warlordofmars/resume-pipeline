@@ -1,12 +1,11 @@
-task('build') {
-    doFirst {
-        exec {
-            commandLine 'hackmyresume', 'build', 'resume.json', 'TO', 'build/resume.all', '-t', 'theme/node_modules/jsonresume-theme-short/'
-        }
+
+def buildResume(format, theme) {
+    exec {
+        commandLine 'hackmyresume', 'build', 'resume.json', 'TO', "build/resume.${format}", '-t', theme
     }
 }
 
-task('analyze') {
+task('analyzeResume') {
     doFirst {
         exec {
             commandLine 'hackmyresume', 'analyze', 'resume.json'
@@ -14,12 +13,30 @@ task('analyze') {
     }
 }
 
-task('validate') {
+task('validateResume') {
     doFirst {
         exec {
             commandLine 'hackmyresume', 'validate', 'resume.json'
         }
     }
+}
+
+task('buildHtmlResume') {
+    mustRunAfter validateResume
+    doFirst {
+        buildResume('html', 'theme/node_modules/jsonresume-theme-short/')
+    }
+}
+
+task('buildPdfResume') {
+    mustRunAfter validateResume
+    doFirst {
+        buildResume('pdf', 'theme/node_modules/jsonresume-theme-short/')
+    }
+}
+
+task('build') {
+    dependsOn validateResume, analyzeResume, buildHtmlResume, buildPdfResume
 }
 
 task('print') {

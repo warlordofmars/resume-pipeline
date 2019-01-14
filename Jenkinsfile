@@ -3,14 +3,9 @@ pipeline {
   stages {
     
     stage('build') {
-      
       steps {
-        sh './gradlew validate'
         sh './gradlew build'
-        sh './gradlew build'
-        sh './gradlew analyze'
-      }
-      
+      }      
     }
 
     stage('test') {
@@ -22,7 +17,7 @@ pipeline {
       }
     }
 
-    stage('deploy') {
+    stage('promote') {
       when {
         branch 'master'
       }
