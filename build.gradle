@@ -15,6 +15,12 @@ buildscript {
     }
 }
 
+plugins {
+    id 'pl.allegro.tech.build.axion-release' version '1.10.0'
+}
+
+project.version = scmVersion.version
+
 ext {
     cloudformationBucket = 'warlordofmars-cloudformation'
     testWebsiteUrl = 'resume-test.warlordofmars.net'
@@ -26,8 +32,12 @@ ext {
     wildcardCertARN = "arn:aws:acm:us-east-1:247631471946:certificate/471106fc-e3dd-4e0b-a20f-010a6e326283"
     productionBranch = 'master'
     ensureStrings = ['John A. Carter', 'johncarter@warlordofmars.net', '(770) 598-7096']
+    resumeSource = 'resume.json'
     htmlResumeTheme = 'theme/node_modules/jsonresume-theme-class/'
     pdfResumeTheme = 'theme/node_modules/jsonresume-theme-short/'
+    spellCheckIgnoreList = 'spell_check_ignore.txt'
+    resumeFormats = ['html', 'pdf', 'yml', 'md', 'json', 'doc']
+    productionNumberOfCopies = 10
 }
 
 if (!project.hasProperty('previewHtmlFileName')) {
@@ -65,5 +75,10 @@ def getHtmlResumeName() {
     return ( isProd() ? productionHtmlFileName : previewHtmlFileName)
 }
 
+def getNumberOfCopies() {
+    return ( isProd() ? productionNumberOfCopies : 1 )
+}
+
 ext.stackName = getStackName()
 ext.websiteUrl = getWebsiteUrl()
+

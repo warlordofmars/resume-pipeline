@@ -12,6 +12,26 @@ cloudFormation {
     ])
 }
 
+task('checkPrerequisites') {
+    doLast {
+        def prerequisites = [
+            'cfn-lint': 'Install via \'pip install cfn-lint\'',
+            'cfn_nag_scan': 'Install via \'gem install cfn-nag\'',
+        ]
+        prerequisites.each { prerequisite, installNotes ->
+            def checkPrereq = exec {
+                commandLine 'which', prerequisite
+                ignoreExitValue true
+                standardOutput new ByteArrayOutputStream()
+            }
+            if (checkPrereq.getExitValue() != 0) {
+                throw new GradleException("It appears that prerequisite '${prerequisite}' is not installed.\n\n${installNotes}\n")
+            }
+
+        }
+    }
+}
+
 task('deploy') {
     dependsOn awsCfnMigrateStackAndWaitCompleted
 }
@@ -23,6 +43,7 @@ task('delete') {
 awsCfnMigrateStack.dependsOn awsCfnUploadTemplate
 
 task('cfnLint') {
+    dependsOn checkPrerequisites
     doFirst {
         exec {
             commandLine 'cfn-lint', cloudformationSource
@@ -31,6 +52,7 @@ task('cfnLint') {
 }
 
 task('cfnNag') {
+    dependsOn checkPrerequisites
     doFirst {
         exec {
             commandLine 'cfn_nag_scan', '--input-path', cloudformationSource

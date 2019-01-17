@@ -1,72 +1,104 @@
 
-def buildResume(format, theme) {
+def buildResumeWithTheme(format, theme) {
     exec {
-        commandLine 'hackmyresume', 'build', 'resume.json', 'TO', "build/resume.${format}", '-t', theme
+        commandLine 'hackmyresume', 'build', resumeSource, 'TO', "${buildDir}/resume.${format}", '-t', theme
+    }
+}
+
+def buildResume(format) {
+    exec {
+        commandLine 'hackmyresume', 'build', resumeSource, 'TO', "${buildDir}/resume.${format}"
+    }
+}
+
+
+task('checkPrerequisites') {
+    doLast {
+        def prerequisites = [
+            'hackmyresume': 'Install via \'npm install -g hackmyresume\'',
+            'aspell': 'Install via \'brew install aspell\'',
+            'lp': 'This is a built-in that should already be there.  Why isn\'t it there?',
+            'aws': 'Install via \'brew install awscli\''
+        ]
+        prerequisites.each { prerequisite, installNotes ->
+            def checkPrereq = exec {
+                commandLine 'which', prerequisite
+                ignoreExitValue true
+                standardOutput new ByteArrayOutputStream()
+            }
+            if (checkPrereq.getExitValue() != 0) {
+                throw new GradleException("It appears that prerequisite '${prerequisite}' is not installed.\n\n${installNotes}\n")
+            }
+
+        }
     }
 }
 
 task('validateResume') {
+    dependsOn checkPrerequisites
     doFirst {
         exec {
-            commandLine 'hackmyresume', 'validate', 'resume.json'
+            commandLine 'hackmyresume', 'validate', resumeSource
         }
     }
 }
 
 task('spellCheck') {
     mustRunAfter validateResume
+    dependsOn checkPrerequisites
     doFirst {
         def out = new ByteArrayOutputStream()
         exec {
-            commandLine 'aspell', 'list', '-t', '--home-dir=.', '--personal=spell_check_ignore.txt'
-            standardInput new ByteArrayInputStream(file('resume.json').text.getBytes())
+            commandLine 'aspell', 'list', '-t', '--home-dir=.', "--personal=${spellCheckIgnoreList}"
+            standardInput new ByteArrayInputStream(file(resumeSource).text.getBytes())
             standardOutput out
         }
         def errors = out.toString().readLines()
         if (errors.size() > 0) {
-            throw new GradleException("There were ${errors.size()} words misspelled in resume.json:\n\n${errors}")
+            throw new GradleException("There were ${errors.size()} words misspelled in ${resumeSource}:\n\n${errors}")
         }
-        println "No spelling errors detected in resume.json"
+        println "No spelling errors detected in ${resumeSource}"
     }
 }
 
 task('checkUrls') {
     mustRunAfter validateResume
     doFirst {
-        def URLs = file('resume.json').text.findAll('http[s]?://[a-zA-Z0-9./-]+')
+        def URLs = file(resumeSource).text.findAll('http[s]?://[a-zA-Z0-9./-]+')
         URLs.each { detectedURL ->
             if (!detectedURL.toURL()) {
-                raise new GradleException("Could not connect to ${detectedURL} found in resume.json")
+                raise new GradleException("Could not connect to ${detectedURL} found in ${resumeSource}")
             } else {
-                println "Found the URL ${detectedURL} in resume.json and it is currently a live link."
+                println "Found the URL ${detectedURL} in ${resumeSource} and it is currently a live link."
             }
         }
     }
 }
 
-task('buildHtmlResume') {
-    mustRunAfter validateResume, spellCheck, checkUrls
-    doFirst {
-        buildResume('html', htmlResumeTheme)
-    }
-}
-
-task('buildPdfResume') {
-    mustRunAfter validateResume, spellCheck, checkUrls
-    doFirst {
-        buildResume('pdf', pdfResumeTheme)
+resumeFormats.each { format ->
+    task("build${format.capitalize()}Resume") {
+        mustRunAfter validateResume, spellCheck, checkUrls
+        doFirst {
+            if (rootProject.hasProperty("${format}ResumeTheme")) {
+                buildResumeWithTheme(format, rootProject.getProperty("${format}ResumeTheme"))
+            } else {
+                buildResume(format)
+            }
+        }
     }
 }
 
 task('analyzeResume') {
+    dependsOn checkPrerequisites
     mustRunAfter validateResume, spellCheck, buildHtmlResume
     doFirst {
         def out = new ByteArrayOutputStream()
         exec {
-            commandLine 'hackmyresume', 'analyze', 'resume.json'
+            commandLine 'hackmyresume', 'analyze', resumeSource
             standardOutput out
         }
         def report = out.toString()
+        file(buildDir).mkdirs()
         file("${buildDir}/resume-analysis.txt").text = report
         println report
     }
@@ -77,34 +109,45 @@ task('clean', type:Delete) {
 }
 
 task('build') {
-    dependsOn validateResume, spellCheck, checkUrls, analyzeResume, buildHtmlResume, buildPdfResume
+    dependsOn validateResume, spellCheck, checkUrls, analyzeResume
+    
+}
+
+build.dependsOn {
+    project.tasks.findAll {
+        it.name ==~ /build.*Resume/
+    }
 }
 
 task('print') {
     mustRunAfter build
+    dependsOn checkPrerequisites
     doFirst {
         exec {
-            commandLine 'lp', "${buildDir}/resume.pdf"
+            commandLine 'lp', '-n', getNumberOfCopies(), "${buildDir}/resume.pdf"
         }
     }
 }
 
 task('publishResume') {
     mustRunAfter build
-    // dependsOn deployStack
+    dependsOn ':website:deploy', checkPrerequisites
     doFirst {
 
         exec {
             commandLine 'aws', 's3', 'cp', "${buildDir}/resume.html", "s3://${getWebsiteUrl()}/${getHtmlResumeName()}"
         }
 
-        // exec {
-        //     commandLine 'open', "https://${getWebsiteUrl()}/${getHtmlResumeName()}"
-        // }
+        exec {
+            commandLine 'aws', 's3', 'cp', "${buildDir}/resume-analysis.txt", "s3://${getWebsiteUrl()}/"
+        }
 
-        // exec {
-        //     commandLine 'say', "Take a look at the preview résumé now"
-        // }
+        resumeFormats.each { format ->
+            exec {
+                commandLine 'aws', 's3', 'cp', "${buildDir}/resume.${format}", "s3://${getWebsiteUrl()}/resume.${format}"
+            }
+        }
+
     }
 }
 
@@ -119,11 +162,18 @@ task('postDeployCheck') {
                 throw new GradleException("The ensure string \"${word}\" was not found in ${deployURL}")
             }
         }
+        resumeFormats.each { format ->
+            if("https://${getWebsiteUrl()}/resume.${format}".toURL()) {
+                println "Found deployed ${format} resume at https://${getWebsiteUrl()}/resume.${format}"
+            } else {
+                throw new GradleException("The ${format} version of the resume could not be found at the deployed URL of https://${getWebsiteUrl()}/resume.${format}")
+            }
+        }
         println "\nThe resume is confirmed to be published to ${deployURL} successfully, and can now be accessed at that URL.\n\nThe resume contains the following key strings we were looking for:\n\n${ensureStrings}\n"
     }
 }
 
 task('deploy') {
-    dependsOn ':website:deploy', publishResume, postDeployCheck
+    dependsOn publishResume, postDeployCheck
 }
 
