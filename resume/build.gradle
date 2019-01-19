@@ -18,7 +18,8 @@ task('checkPrerequisites') {
             'hackmyresume': 'Install via \'npm install -g hackmyresume\'',
             'aspell': 'Install via \'brew install aspell\'',
             'lp': 'This is a built-in that should already be there.  Why isn\'t it there?',
-            'aws': 'Install via \'brew install awscli\''
+            'aws': 'Install via \'brew install awscli\'',
+            'wkhtmltopdf': 'Install via \'brew install wkhtmltopdf\''
         ]
         prerequisites.each { prerequisite, installNotes ->
             def checkPrereq = exec {
@@ -125,6 +126,15 @@ task('print') {
     doFirst {
         exec {
             commandLine 'lp', '-n', getNumberOfCopies(), "${buildDir}/resume.pdf"
+        }
+    }
+}
+
+task('printPreview') {
+    dependsOn buildPdfResume
+    doFirst {
+        exec {
+            commandLine 'open', "${buildDir}/resume.pdf"
         }
     }
 }

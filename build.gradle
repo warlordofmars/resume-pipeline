@@ -36,7 +36,7 @@ ext {
     htmlResumeTheme = 'theme/node_modules/jsonresume-theme-class/'
     pdfResumeTheme = 'theme/node_modules/jsonresume-theme-short/'
     spellCheckIgnoreList = 'spell_check_ignore.txt'
-    resumeFormats = ['html', 'pdf', 'yml', 'md', 'json', 'doc']
+    resumeFormats = ['html', 'pdf', 'yml', 'md', 'json']
     productionNumberOfCopies = 10
 }
 
