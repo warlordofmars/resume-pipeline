@@ -1,13 +1,15 @@
 
+import org.apache.tools.ant.filters.ReplaceTokens
+
 def buildResumeWithTheme(format, theme) {
     exec {
-        commandLine 'hackmyresume', 'build', resumeSource, 'TO', "${buildDir}/resume.${format}", '-t', theme
+        commandLine 'hackmyresume', 'build', "${buildDir}/${resumeSource}", 'TO', "${buildDir}/resume.${format}", '-t', theme
     }
 }
 
 def buildResume(format) {
     exec {
-        commandLine 'hackmyresume', 'build', resumeSource, 'TO', "${buildDir}/resume.${format}"
+        commandLine 'hackmyresume', 'build', "${buildDir}/${resumeSource}", 'TO', "${buildDir}/resume.${format}"
     }
 }
 
@@ -76,8 +78,21 @@ task('checkUrls') {
     }
 }
 
+
+task('versionResume', type:Copy) {
+    mustRunAfter checkUrls, spellCheck
+    from projectDir
+    into buildDir
+    include resumeSource
+    filter(ReplaceTokens, tokens: ['version': rootProject.version])
+    doLast {
+        println "Versioning ${resumeSource} to version ${rootProject.version}"
+    }
+}
+
 resumeFormats.each { format ->
     task("build${format.capitalize()}Resume") {
+        dependsOn versionResume
         mustRunAfter validateResume, spellCheck, checkUrls
         doFirst {
             if (rootProject.hasProperty("${format}ResumeTheme")) {

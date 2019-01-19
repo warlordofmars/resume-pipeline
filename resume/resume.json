@@ -1,4 +1,7 @@
 {
+  "meta": {
+    "version": "@version@"
+  },
   "basics": {
     "name": "John A. Carter",
     "label": "Systems Administrator",
