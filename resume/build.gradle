@@ -125,7 +125,7 @@ task('print') {
     dependsOn checkPrerequisites
     doFirst {
         exec {
-            commandLine 'lp', '-n', getNumberOfCopies(), "${buildDir}/resume.pdf"
+            commandLine 'lp', '-n', getNumberOfCopies(), '-o', 'fit-to-page', '-o', 'sides=two-sided-long-edge', '-o', 'media=letter', "${buildDir}/resume.pdf"
         }
     }
 }
