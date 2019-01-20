@@ -1,7 +1,4 @@
 {
-  "meta": {
-    "version": "@version@"
-  },
   "basics": {
     "name": "John A. Carter",
     "label": "Systems Administrator",
@@ -203,15 +200,6 @@
             "ServiceNow"
 
         ]
-    }
-  ],
-  "interests": [
-    {
-      "name": "Wildlife",
-      "keywords": [
-        "Ferrets",
-        "Unicorns"
-      ]
     }
   ]
 }

@@ -1,5 +1,7 @@
 
-import org.apache.tools.ant.filters.ReplaceTokens
+import groovy.json.JsonSlurper
+import groovy.json.JsonBuilder
+import java.util.TimeZone
 
 def buildResumeWithTheme(format, theme) {
     exec {
@@ -40,8 +42,15 @@ task('checkPrerequisites') {
 task('validateResume') {
     dependsOn checkPrerequisites
     doFirst {
+        def output = new ByteArrayOutputStream()
         exec {
             commandLine 'hackmyresume', 'validate', resumeSource
+            standardOutput output
+        }
+        if (output.toString().contains('INVALID')) {
+            throw new GradleException("Resume validation has failed:\n\n${output.toString()}")
+        } else {
+            println output.toString()
         }
     }
 }
@@ -79,14 +88,20 @@ task('checkUrls') {
 }
 
 
-task('versionResume', type:Copy) {
+task('versionResume') {
     mustRunAfter checkUrls, spellCheck
-    from projectDir
-    into buildDir
-    include resumeSource
-    filter(ReplaceTokens, tokens: ['version': rootProject.version])
     doLast {
-        println "Versioning ${resumeSource} to version ${rootProject.version}"
+        def resumeFile = file(resumeSource)
+        def resumeLastModified = new Date(resumeFile.lastModified()).format('YYYY-MM-DD\'Z\'hh:mm:ss', TimeZone.getTimeZone('GMT'))
+        def resumeObj = new JsonSlurper().parseText(resumeFile.text)
+        resumeObj['meta'] = [ 
+            version: rootProject.version,
+            lastModified: resumeLastModified
+        ]
+        file("${buildDir}").mkdirs()
+        file("${buildDir}/${resumeSource}").write(new JsonBuilder(resumeObj).toPrettyString())
+        // println "Versioning ${resumeSource} to version ${rootProject.version}"
+
     }
 }
 
