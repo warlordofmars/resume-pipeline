@@ -14,6 +14,10 @@ cloudFormation {
 
 task('deploy') {
     dependsOn awsCfnMigrateStackAndWaitCompleted
+    finalizedBy rootProject.processTestResults
+    doLast {
+        rootProject.ext.testResults << [classname: cloudformationSource, name: 'CloudFormation Template Successfully Deployed']
+    }
 }
 
 task('delete') {
@@ -24,19 +28,23 @@ awsCfnMigrateStack.dependsOn awsCfnUploadTemplate
 
 task('cfnLint') {
     dependsOn rootProject.checkPrerequisites
+    finalizedBy rootProject.processTestResults
     doFirst {
         exec {
             commandLine 'cfn-lint', cloudformationSource
         }
+        rootProject.ext.testResults << [classname: cloudformationSource, name: 'cfn-lint: CloudFormation Linting']
     }
 }
 
 task('cfnNag') {
     dependsOn rootProject.checkPrerequisites
+    finalizedBy rootProject.processTestResults
     doFirst {
         exec {
             commandLine 'cfn_nag_scan', '--input-path', cloudformationSource
         }
+        rootProject.ext.testResults << [classname: cloudformationSource, name: 'cfn_nag: CloudFormation Best Practices']
     }
 }
 

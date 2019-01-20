@@ -38,6 +38,7 @@ ext {
     spellCheckIgnoreList = 'spell_check_ignore.txt'
     resumeFormats = ['html', 'pdf', 'yml', 'md']
     productionNumberOfCopies = 10
+    testResults = []
 }
 
 if (!project.hasProperty('previewHtmlFileName')) {
@@ -104,5 +105,22 @@ task('checkPrerequisites') {
             }
 
         }
+    }
+}
+
+task('processTestResults') {
+    mustRunAfter ':website:cfnLint'
+    doLast {
+        // ext.testResults = [
+        //     [classname: 'resume.json', 'name': 'JSON Resume Schema Validation']
+        // ]
+        def testResultsXml = "<testsuite tests=\"${testResults.size()}\">\n"
+        testResults.each { result ->
+            testResultsXml = testResultsXml + "    <testcase classname=\"${result['classname']}\" name=\"${result['name']}\"/>\n"
+
+        }
+        testResultsXml = testResultsXml + '</testsuite>'
+        file("${buildDir}/tests").mkdirs()
+        file("${buildDir}/tests/results.xml").text = testResultsXml
     }
 }

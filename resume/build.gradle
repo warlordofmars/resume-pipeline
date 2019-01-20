@@ -16,6 +16,7 @@ def buildResume(format) {
 }
 
 task('validateResume') {
+    finalizedBy rootProject.processTestResults
     dependsOn rootProject.checkPrerequisites
     doFirst {
         def output = new ByteArrayOutputStream()
@@ -27,11 +28,13 @@ task('validateResume') {
             throw new GradleException("Resume validation has failed:\n\n${output.toString()}")
         } else {
             println output.toString()
+            rootProject.ext.testResults << [classname: resumeSource, name: "Valid JSON Resume Schema"]
         }
     }
 }
 
 task('spellCheck') {
+    finalizedBy rootProject.processTestResults
     mustRunAfter validateResume
     dependsOn rootProject.checkPrerequisites
     doFirst {
@@ -46,10 +49,12 @@ task('spellCheck') {
             throw new GradleException("There were ${errors.size()} words misspelled in ${resumeSource}:\n\n${errors}")
         }
         println "No spelling errors detected in ${resumeSource}"
+        rootProject.ext.testResults << [classname: resumeSource, name: "No spelling errors detected in ${resumeSource}"]
     }
 }
 
 task('checkUrls') {
+    finalizedBy rootProject.processTestResults
     mustRunAfter validateResume
     doFirst {
         def URLs = file(resumeSource).text.findAll('http[s]?://[a-zA-Z0-9./-]+')
@@ -57,6 +62,7 @@ task('checkUrls') {
             try {
                 def test = detectedURL.toURL().text
                 println "Found the URL ${detectedURL} in ${resumeSource} and it is currently a live link."
+                rootProject.ext.testResults << [classname: resumeSource, name: "Found the URL ${detectedURL} in ${resumeSource} and it is currently a live link."]
             } catch(Exception e) {
                 throw new GradleException("Could not connect to the URL: ${detectedURL} \nFound in ${resumeSource}\n\n${e.toString()}")
             }
@@ -97,6 +103,7 @@ resumeFormats.each { format ->
 }
 
 task('analyzeResume') {
+    finalizedBy rootProject.processTestResults
     dependsOn rootProject.checkPrerequisites
     mustRunAfter validateResume, spellCheck, buildHtmlResume
     doFirst {
@@ -109,6 +116,7 @@ task('analyzeResume') {
         file(buildDir).mkdirs()
         file("${buildDir}/resume-analysis.txt").text = report
         println report
+        rootProject.ext.testResults << [classname: resumeSource, name: 'hackmyresume: Resume Analysis Generated']
     }
 }
 
@@ -147,6 +155,7 @@ task('printPreview') {
 }
 
 task('publishResume') {
+    finalizedBy rootProject.processTestResults
     mustRunAfter build
     dependsOn ':website:deploy', rootProject.checkPrerequisites
     doFirst {
@@ -165,11 +174,14 @@ task('publishResume') {
             }
         }
 
+        rootProject.ext.testResults << [classname: resumeSource, name: 'Successfully deployed resume files to website']
+
     }
 }
 
 
 task('postDeployCheck') {
+    finalizedBy rootProject.processTestResults
     mustRunAfter publishResume
     doFirst {
         def deployURL = "https://${getWebsiteUrl()}/${getHtmlResumeName()}"
@@ -179,9 +191,11 @@ task('postDeployCheck') {
                 throw new GradleException("The ensure string \"${word}\" was not found in ${deployURL}")
             }
         }
+        rootProject.ext.testResults << [classname: resumeSource, name: 'All expected strings found in deployed HTML resume']
         resumeFormats.each { format ->
             if("https://${getWebsiteUrl()}/resume.${format}".toURL()) {
                 println "Found deployed ${format} resume at https://${getWebsiteUrl()}/resume.${format}"
+                rootProject.ext.testResults << [classname: resumeSource, name: "Deployed resume found at https://${getWebsiteUrl()}/resume.${format}"]
             } else {
                 throw new GradleException("The ${format} version of the resume could not be found at the deployed URL of https://${getWebsiteUrl()}/resume.${format}")
             }
