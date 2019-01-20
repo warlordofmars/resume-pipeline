@@ -48,8 +48,9 @@ task('spellCheck') {
         if (errors.size() > 0) {
             throw new GradleException("There were ${errors.size()} words misspelled in ${resumeSource}:\n\n${errors}")
         }
-        println "No spelling errors detected in ${resumeSource}"
-        rootProject.ext.testResults << [classname: resumeSource, name: "No spelling errors detected in ${resumeSource}"]
+        def message = "No spelling errors detected in ${resumeSource}"
+        rootProject.ext.testResults << [classname: resumeSource, name: "No spelling errors detected in ${resumeSource}", systemOut: message]
+        print message
     }
 }
 
@@ -116,7 +117,7 @@ task('analyzeResume') {
         file(buildDir).mkdirs()
         file("${buildDir}/resume-analysis.txt").text = report
         println report
-        rootProject.ext.testResults << [classname: resumeSource, name: 'hackmyresume: Resume Analysis Generated']
+        rootProject.ext.testResults << [classname: resumeSource, name: 'hackmyresume: Resume Analysis Generated', systemOut: report]
     }
 }
 

@@ -41,10 +41,13 @@ task('cfnNag') {
     dependsOn rootProject.checkPrerequisites
     finalizedBy rootProject.processTestResults
     doFirst {
+        def out = new ByteArrayOutputStream()
         exec {
             commandLine 'cfn_nag_scan', '--input-path', cloudformationSource
+            standardOutput out
         }
-        rootProject.ext.testResults << [classname: cloudformationSource, name: 'cfn_nag: CloudFormation Best Practices']
+        rootProject.ext.testResults << [classname: cloudformationSource, name: 'cfn_nag: CloudFormation Best Practices', standardOut: out.toString()]
+        println out.toString()
     }
 }
 
