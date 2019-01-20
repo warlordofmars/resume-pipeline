@@ -46,7 +46,7 @@ task('cfnNag') {
             commandLine 'cfn_nag_scan', '--input-path', cloudformationSource
             standardOutput out
         }
-        rootProject.ext.testResults << [classname: cloudformationSource, name: 'cfn_nag: CloudFormation Best Practices', standardOut: out.toString()]
+        rootProject.ext.testResults << [classname: cloudformationSource, name: 'cfn_nag: CloudFormation Best Practices', systemOut: out.toString()]
         println out.toString()
     }
 }
