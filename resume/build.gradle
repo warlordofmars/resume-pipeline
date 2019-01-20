@@ -15,32 +15,8 @@ def buildResume(format) {
     }
 }
 
-
-task('checkPrerequisites') {
-    doLast {
-        def prerequisites = [
-            'hackmyresume': 'Install via \'npm install -g hackmyresume\'',
-            'aspell': 'Install via \'brew install aspell\'',
-            'lp': 'This is a built-in that should already be there.  Why isn\'t it there?',
-            'aws': 'Install via \'brew install awscli\'',
-            'wkhtmltopdf': 'Install via \'brew install wkhtmltopdf\''
-        ]
-        prerequisites.each { prerequisite, installNotes ->
-            def checkPrereq = exec {
-                commandLine 'which', prerequisite
-                ignoreExitValue true
-                standardOutput new ByteArrayOutputStream()
-            }
-            if (checkPrereq.getExitValue() != 0) {
-                throw new GradleException("It appears that prerequisite '${prerequisite}' is not installed.\n\n${installNotes}\n")
-            }
-
-        }
-    }
-}
-
 task('validateResume') {
-    dependsOn checkPrerequisites
+    dependsOn rootProject.checkPrerequisites
     doFirst {
         def output = new ByteArrayOutputStream()
         exec {
@@ -57,7 +33,7 @@ task('validateResume') {
 
 task('spellCheck') {
     mustRunAfter validateResume
-    dependsOn checkPrerequisites
+    dependsOn rootProject.checkPrerequisites
     doFirst {
         def out = new ByteArrayOutputStream()
         exec {
@@ -88,7 +64,7 @@ task('checkUrls') {
 }
 
 
-task('versionResume') {
+task('buildResume') {
     mustRunAfter checkUrls, spellCheck
     doLast {
         def resumeFile = file(resumeSource)
@@ -100,14 +76,14 @@ task('versionResume') {
         ]
         file("${buildDir}").mkdirs()
         file("${buildDir}/${resumeSource}").write(new JsonBuilder(resumeObj).toPrettyString())
-        // println "Versioning ${resumeSource} to version ${rootProject.version}"
+        println "Versioning ${resumeSource} to version ${rootProject.version}"
 
     }
 }
 
 resumeFormats.each { format ->
     task("build${format.capitalize()}Resume") {
-        dependsOn versionResume
+        dependsOn buildResume
         mustRunAfter validateResume, spellCheck, checkUrls
         doFirst {
             if (rootProject.hasProperty("${format}ResumeTheme")) {
@@ -120,7 +96,7 @@ resumeFormats.each { format ->
 }
 
 task('analyzeResume') {
-    dependsOn checkPrerequisites
+    dependsOn rootProject.checkPrerequisites
     mustRunAfter validateResume, spellCheck, buildHtmlResume
     doFirst {
         def out = new ByteArrayOutputStream()
@@ -152,7 +128,7 @@ build.dependsOn {
 
 task('print') {
     mustRunAfter build
-    dependsOn checkPrerequisites
+    dependsOn rootProject.checkPrerequisites
     doFirst {
         exec {
             commandLine 'lp', '-n', getNumberOfCopies(), '-o', 'fit-to-page', '-o', 'sides=two-sided-long-edge', '-o', 'media=letter', "${buildDir}/resume.pdf"
@@ -171,7 +147,7 @@ task('printPreview') {
 
 task('publishResume') {
     mustRunAfter build
-    dependsOn ':website:deploy', checkPrerequisites
+    dependsOn ':website:deploy', rootProject.checkPrerequisites
     doFirst {
 
         exec {

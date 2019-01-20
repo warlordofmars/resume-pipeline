@@ -82,3 +82,27 @@ def getNumberOfCopies() {
 ext.stackName = getStackName()
 ext.websiteUrl = getWebsiteUrl()
 
+task('checkPrerequisites') {
+    doLast {
+        def prerequisites = [
+            'hackmyresume': 'Install via \'npm install -g hackmyresume\'',
+            'aspell': 'Install via \'brew install aspell\'',
+            'lp': 'This is a built-in that should already be there.  Why isn\'t it there?',
+            'aws': 'Install via \'brew install awscli\'',
+            'wkhtmltopdf': 'Install via \'brew install wkhtmltopdf\'',
+            'cfn-lint': 'Install via \'pip install cfn-lint\'',
+            'cfn_nag_scan': 'Install via \'gem install cfn-nag\''
+        ]
+        prerequisites.each { prerequisite, installNotes ->
+            def checkPrereq = exec {
+                commandLine 'which', prerequisite
+                ignoreExitValue true
+                standardOutput new ByteArrayOutputStream()
+            }
+            if (checkPrereq.getExitValue() != 0) {
+                throw new GradleException("It appears that prerequisite '${prerequisite}' is not installed.\n\n${installNotes}\n")
+            }
+
+        }
+    }
+}
