@@ -121,6 +121,8 @@ task('processTestResults') {
         }
         testResultsXml = testResultsXml + '</testsuite>'
         file("${buildDir}/tests").mkdirs()
-        file("${buildDir}/tests/results.xml").text = testResultsXml
+        def random = new Random()
+    def randomNumber = random.nextInt() & Integer.MAX_VALUE
+        file("${buildDir}/tests/results-${randomNumber}.xml").text = testResultsXml
     }
 }
