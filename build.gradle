@@ -111,7 +111,7 @@ task('checkPrerequisites') {
 task('processTestResults') {
     mustRunAfter ':website:cfnLint'
     doLast {
-        def testResultsXml = "<testsuite tests=\"${testResults.size()}\">\n"
+        def testResultsXml = "<testsuite name=\"${gradle.startParameter.taskNames.join('-')}\" tests=\"${testResults.size()}\">\n"
         testResults.each { result ->
             testResultsXml = testResultsXml + "    <testcase classname=\"${result['classname']}\" name=\"${result['name']}\">\n"
             if(result.containsKey('systemOut')) {

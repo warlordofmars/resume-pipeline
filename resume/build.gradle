@@ -49,7 +49,7 @@ task('spellCheck') {
             throw new GradleException("There were ${errors.size()} words misspelled in ${resumeSource}:\n\n${errors}")
         }
         def message = "No spelling errors detected in ${resumeSource}"
-        rootProject.ext.testResults << [classname: resumeSource, name: "No spelling errors detected in ${resumeSource}", systemOut: message]
+        rootProject.ext.testResults << [classname: resumeSource, name: 'Resume Spell Check', systemOut: message]
         print message
     }
 }
@@ -63,11 +63,12 @@ task('checkUrls') {
             try {
                 def test = detectedURL.toURL().text
                 println "Found the URL ${detectedURL} in ${resumeSource} and it is currently a live link."
-                rootProject.ext.testResults << [classname: resumeSource, name: "Found the URL ${detectedURL} in ${resumeSource} and it is currently a live link."]
+                
             } catch(Exception e) {
                 throw new GradleException("Could not connect to the URL: ${detectedURL} \nFound in ${resumeSource}\n\n${e.toString()}")
             }
         }
+        rootProject.ext.testResults << [classname: resumeSource, name: "Resume URLs are Valid", systemOut: "All URLs found in ${resumeSource} are valid URLs and are currently responding:\n${URLs}"]
     }
 }
 
@@ -76,7 +77,7 @@ task('buildResume') {
     mustRunAfter checkUrls, spellCheck
     doLast {
         def resumeFile = file(resumeSource)
-        def resumeLastModified = new Date(resumeFile.lastModified()).format('YYYY-MM-DD\'Z\'hh:mm:ss', TimeZone.getTimeZone('GMT'))
+        def resumeLastModified = new Date(resumeFile.lastModified()).format('YYYY-MM-DD\'T\'hh:mm:ss\'Z\'', TimeZone.getTimeZone('GMT'))
         def resumeObj = new JsonSlurper().parseText(resumeFile.text)
         resumeObj['meta'] = [ 
             version: rootProject.version,
@@ -192,15 +193,19 @@ task('postDeployCheck') {
                 throw new GradleException("The ensure string \"${word}\" was not found in ${deployURL}")
             }
         }
-        rootProject.ext.testResults << [classname: resumeSource, name: 'All expected strings found in deployed HTML resume']
+        rootProject.ext.testResults << [classname: resumeSource, name: 'Expected Strings Found in Deployed HTML Resume', systemOut: "Found all expected strings in deployed HTML resume at ${deployURL}:\n${ensureStrings}"]
+        def urlList = []
         resumeFormats.each { format ->
             if("https://${getWebsiteUrl()}/resume.${format}".toURL()) {
-                println "Found deployed ${format} resume at https://${getWebsiteUrl()}/resume.${format}"
-                rootProject.ext.testResults << [classname: resumeSource, name: "Deployed resume found at https://${getWebsiteUrl()}/resume.${format}"]
+                println "Found deployed ${format} resume at https://${getWebsiteUrl()}/resume.${format}"                
+                urlList << "https://${getWebsiteUrl()}/resume.${format}"
             } else {
                 throw new GradleException("The ${format} version of the resume could not be found at the deployed URL of https://${getWebsiteUrl()}/resume.${format}")
             }
         }
+        def message = "All resume formats have been deployed successfully and are currently web-accessible at the following URLs:\n${urlList}"
+
+        rootProject.ext.testResults << [classname: resumeSource, name: "Deployed Resumes Are Web Accessible", systemOut: message]
         println "\nThe resume is confirmed to be published to ${deployURL} successfully, and can now be accessed at that URL.\n\nThe resume contains the following key strings we were looking for:\n\n${ensureStrings}\n"
     }
 }
@@ -208,4 +213,3 @@ task('postDeployCheck') {
 task('deploy') {
     dependsOn publishResume, postDeployCheck
 }
-
