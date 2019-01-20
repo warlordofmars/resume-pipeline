@@ -111,18 +111,25 @@ task('checkPrerequisites') {
 task('processTestResults') {
     mustRunAfter ':website:cfnLint'
     doLast {
-        // ext.testResults = [
-        //     [classname: 'resume.json', 'name': 'JSON Resume Schema Validation']
-        // ]
         def testResultsXml = "<testsuite tests=\"${testResults.size()}\">\n"
         testResults.each { result ->
-            testResultsXml = testResultsXml + "    <testcase classname=\"${result['classname']}\" name=\"${result['name']}\"/>\n"
-
+            testResultsXml = testResultsXml + "    <testcase classname=\"${result['classname']}\" name=\"${result['name']}\">\n"
+            if(result.containsKey('systemOut')) {
+                testResultsXml = testResultsXml + "        <system-out>${result['systemOut']}</system-out>\n"
+            }
+            if(result.containsKey('systemErr')) {
+                testResultsXml = testResultsXml + "        <system-err>${result['systemErr']}</system-err>\n"
+            }
+            testResultsXml = testResultsXml + '    </testcase>'
         }
         testResultsXml = testResultsXml + '</testsuite>'
         file("${buildDir}/tests").mkdirs()
         def random = new Random()
-    def randomNumber = random.nextInt() & Integer.MAX_VALUE
+        def randomNumber = random.nextInt() & Integer.MAX_VALUE
         file("${buildDir}/tests/results-${randomNumber}.xml").text = testResultsXml
     }
+}
+
+task('clean', type:Delete) {
+    delete buildDir
 }
