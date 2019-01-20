@@ -54,10 +54,11 @@ task('checkUrls') {
     doFirst {
         def URLs = file(resumeSource).text.findAll('http[s]?://[a-zA-Z0-9./-]+')
         URLs.each { detectedURL ->
-            if (!detectedURL.toURL()) {
-                raise new GradleException("Could not connect to ${detectedURL} found in ${resumeSource}")
-            } else {
+            try {
+                def test = detectedURL.toURL().text
                 println "Found the URL ${detectedURL} in ${resumeSource} and it is currently a live link."
+            } catch(Exception e) {
+                throw new GradleException("Could not connect to the URL: ${detectedURL} \nFound in ${resumeSource}\n\n${e.toString()}")
             }
         }
     }

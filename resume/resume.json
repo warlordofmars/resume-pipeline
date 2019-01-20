@@ -2,7 +2,6 @@
   "basics": {
     "name": "John A. Carter",
     "label": "Systems Administrator",
-    "picture": "http://www.datacenterknowledge.com/wp-content/uploads/2011/04/prineville-servers-1000.jpg",
     "email": "johncarter@warlordofmars.net",
     "phone": "(770) 598-7096",
     "summary": "An experienced and accomplished Systems Administrator, with a background in software development, that has demonstrated a strong passion for automation and innovation of all facets related to the software development life-cycle and all underlying infrastructure required.  Looking for a position that would leverage principles from software development, traditional systems administration, and other principles under the DevOps umbrella, in order to contribute to, and improve, an overall customer value chain of an organization that shares the same passion.",
@@ -42,7 +41,6 @@
       "company": "Digi-Net Technologies, Inc.",
       "position": "Director of Technology",
       "location": "Atlanta, GA",
-      "website": "http://digi-net.com",
       "startDate": "2006-01-01",
       "endDate": "2010-12-01",
       "summary": "Managed all software development and infrastructure supporting a varying range of Java-based SaaS applications",
@@ -63,7 +61,6 @@
     {
       "company": "Digi-Net Technologies, Inc.",
       "position": "Senior Systems Administrator",
-      "website": "http://digi-net.com",
       "startDate": "2002-04-01",
       "endDate": "2006-01-01",
       "summary": "Managed all infrastructure supporting a varying range of Java-based SaaS applications",
@@ -78,7 +75,6 @@
     {
       "company": "Digi-Net Technologies, Inc.",
       "position": "Product Support Manager",
-      "website": "http://digi-net.com",
       "startDate": "2000-09-01",
       "endDate": "2002-04-01",
       "summary": "Managed a team of product support engineers, supporting a varying range of Java-based applications on the web",
@@ -91,7 +87,6 @@
     {
       "company": "Digi-Net Technologies, Inc.",
       "position": "Product Support Engineer",
-      "website": "http://digi-net.com",
       "startDate": "2000-05-01",
       "endDate": "2000-09-01",
       "summary": "Provided end-user support for a Java-based chat application",
