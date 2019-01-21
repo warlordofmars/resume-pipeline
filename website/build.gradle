@@ -26,7 +26,7 @@ task('deploy') {
         
         def stackDetails = new JsonSlurper().parseText(out.toString())['Stacks'][0]
         def message = "${stackDetails['StackName']} status: ${stackDetails['StackStatus']}"
-        rootProject.ext.testResults << [classname: cloudformationSource, name: 'CloudFormation Template Successfully Deployed', systemOut: message]
+        rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Template Deployed', systemOut: message]
     }
 }
 
@@ -43,7 +43,7 @@ task('cfnLint') {
         exec {
             commandLine 'cfn-lint', cloudformationSource
         }
-        rootProject.ext.testResults << [classname: cloudformationSource, name: 'cfn-lint: CloudFormation Linting']
+        rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Linting / Syntax Check']
     }
 }
 
@@ -56,7 +56,7 @@ task('cfnNag') {
             commandLine 'cfn_nag_scan', '--input-path', cloudformationSource
             standardOutput out
         }
-        rootProject.ext.testResults << [classname: cloudformationSource, name: 'cfn_nag: CloudFormation Best Practices', systemOut: out.toString()]
+        rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Best Practices', systemOut: out.toString()]
         println out.toString()
     }
 }

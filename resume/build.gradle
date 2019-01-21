@@ -118,7 +118,7 @@ task('analyzeResume') {
         file(buildDir).mkdirs()
         file("${buildDir}/resume-analysis.txt").text = report
         println report
-        rootProject.ext.testResults << [classname: resumeSource, name: 'hackmyresume: Resume Analysis Generated', systemOut: report]
+        rootProject.ext.testResults << [classname: resumeSource, name: 'Resume Content Analysis', systemOut: report]
     }
 }
 
@@ -175,9 +175,6 @@ task('publishResume') {
                 commandLine 'aws', 's3', 'cp', "${buildDir}/resume.${format}", "s3://${getWebsiteUrl()}/resume.${format}"
             }
         }
-
-        rootProject.ext.testResults << [classname: resumeSource, name: 'Successfully deployed resume files to website']
-
     }
 }
 
