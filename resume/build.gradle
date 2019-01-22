@@ -66,7 +66,9 @@ task('checkUrls') {
                 println "Found the URL ${detectedURL} in ${resumeSource} and it is currently a live link."
                 
             } catch(Exception e) {
-                throw new GradleException("Could not connect to the URL: ${detectedURL} \nFound in ${resumeSource}\n\n${e.toString()}")
+                def message = "Could not connect to the URL: ${detectedURL} \nFound in ${resumeSource}\n\n${e.toString()}"
+                rootProject.ext.testResults << [classname: resumeSource, name: "Resume URLs Validation", failure: [type: 'Bad URL Found', details: message]]
+                throw new GradleException(message)
             }
         }
         rootProject.ext.testResults << [classname: resumeSource, name: "Resume URLs Validation", systemOut: "All URLs found in ${resumeSource} are valid URLs and are currently responding:\n\n${URLs.join('\n')}"]
