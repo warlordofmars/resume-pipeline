@@ -38,11 +38,11 @@ Resources:
           Principal: '*'
           Action: s3:GetObject
           Resource: !Join ['', ['arn:aws:s3:::', !Ref 'WebsiteBucket', /*]]
-    # Metadata:
-    #   cfn_nag:
-    #     rules_to_suppress:
-    #       - id: F16
-    #         reason: "This is a public facing website and ingress from the internet should be permitted."
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F16
+            reason: "This is a public facing website and ingress from the internet should be permitted."
   WebsiteCloudfront:
     Type: AWS::CloudFront::Distribution
     Properties:
