@@ -200,11 +200,15 @@ task('postDeployCheck') {
         rootProject.ext.testResults << [classname: resumeSource, name: 'Expected Strings Found in Deployed HTML Resume', systemOut: "Found all expected strings in deployed HTML resume at ${deployURL}:\n\n${ensureStrings.join('\n')}"]
         def urlList = []
         resumeFormats.each { format ->
-            if("https://${getWebsiteUrl()}/resume.${format}".toURL()) {
-                println "Found deployed ${format} resume at https://${getWebsiteUrl()}/resume.${format}"                
-                urlList << "https://${getWebsiteUrl()}/resume.${format}"
-            } else {
-                throw new GradleException("The ${format} version of the resume could not be found at the deployed URL of https://${getWebsiteUrl()}/resume.${format}")
+            def url = "https://${getWebsiteUrl()}/asdfresume.${format}"
+            try {
+                def test = url.toURL().text
+                println "Found deployed ${format} resume at ${url}"                
+                urlList << url
+            } catch(Exception e) {
+                def message = "The ${format} version of the resume could not be found at the deployed URL of ${url}\n\n${e.toString()}"
+                rootProject.ext.testResults << [classname: resumeSource, name: "Deployed Resumes Are Web Accessible", failure: [type: 'Deployed Resume Not Accessible', details: message]]
+                throw new GradleException(message)
             }
         }
         def message = "All resume formats have been deployed successfully and are currently web-accessible at the following URLs:\n\n${urlList.join('\n')}"
