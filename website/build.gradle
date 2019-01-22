@@ -52,12 +52,19 @@ task('cfnNag') {
     finalizedBy rootProject.processTestResults
     doFirst {
         def out = new ByteArrayOutputStream()
-        exec {
+        def result = exec {
             commandLine 'cfn_nag_scan', '--input-path', cloudformationSource
             standardOutput out
+            ignoreExitValue true
         }
-        rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Best Practices', systemOut: out.toString()]
-        println out.toString()
+        if(result.getExitValue() == 0) {
+            rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Best Practices', systemOut: out.toString()]
+            println out.toString()
+        } else {
+            rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Best Practices', failure: [type: 'Not Adhering to CloudFormation Best Practices', details: out.toString()]]
+            throw new GradleException(out.toString())
+        }
+        
     }
 }
 
