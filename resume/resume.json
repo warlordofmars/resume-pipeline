@@ -21,7 +21,7 @@
       "startDate": "2010-12-01",
       "summary": "Provided infrastructure and application support for a book publishing company.",
       "highlights": [
-        "Architected and implemented a complete private cloud infrastructure utilizing HP Servers, NetApp Storage, and VMware",
+        "Architected and iasdfmplemented a complete private cloud infrastructure utilizing HP Servers, NetApp Storage, and VMware",
         "Migrated all legacy applications and physical servers to private cloud infrastructure",
         "Provided lead infrastructure support in effort involving transitioning off of mainframe-based application to more modern application framework hosted in private cloud infrastructure",
         "Developed enterprise-level job scheduler responsible for stuff",

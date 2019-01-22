@@ -47,7 +47,9 @@ task('spellCheck') {
         }
         def errors = out.toString().readLines()
         if (errors.size() > 0) {
-            throw new GradleException("There were ${errors.size()} words misspelled in ${resumeSource}:\n\n${errors}")
+            def message = "There were ${errors.size()} words misspelled in ${resumeSource}:\n\n${errors}"
+            rootProject.ext.testResults << [classname: resumeSource, name: 'Resume Spell Check', failure: [type: 'Mis-spelled Word', details: message]]
+            throw new GradleException(message)
         }
         def message = "No spelling errors detected in ${resumeSource}"
         rootProject.ext.testResults << [classname: resumeSource, name: 'Resume Spell Check', systemOut: message]
