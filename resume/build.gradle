@@ -188,7 +188,9 @@ task('postDeployCheck') {
         def content = deployURL.toURL().text
         ensureStrings.each { word ->
             if (!content.contains(word)) {
-                throw new GradleException("The ensure string \"${word}\" was not found in ${deployURL}")
+                def message = "The ensure string \"${word}\" was not found in ${deployURL}"
+                rootProject.ext.testResults << [classname: resumeSource, name: 'Expected Strings Found in Deployed HTML Resume', failure: [type: 'Expected String Not Found', details: message]]
+                throw new GradleException(message)
             }
         }
         rootProject.ext.testResults << [classname: resumeSource, name: 'Expected Strings Found in Deployed HTML Resume', systemOut: "Found all expected strings in deployed HTML resume at ${deployURL}:\n\n${ensureStrings.join('\n')}"]
