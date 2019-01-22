@@ -40,10 +40,18 @@ task('cfnLint') {
     dependsOn rootProject.checkPrerequisites
     finalizedBy rootProject.processTestResults
     doFirst {
-        exec {
+        def out = new ByteArrayOutputStream()
+        def result = exec {
             commandLine 'cfn-lint', cloudformationSource
+            standardOutput out
+            ignoreExitValue true
         }
-        rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Linting / Syntax Check', systemOut: 'All Checks Passed']
+        if(result.getExitValue() == 0) {
+            rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Linting / Syntax Check', systemOut: 'All Checks Passed']
+        } else {
+            rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Linting / Syntax Check', failure: [type: 'CloudFormation Syntax Error', details: out.toString()]]
+            throw new GradleException(out.toString())
+        }
     }
 }
 

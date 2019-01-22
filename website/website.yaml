@@ -44,7 +44,7 @@ Resources:
           - id: F16
             reason: "This is a public facing website and ingress from the internet should be permitted."
   WebsiteCloudfront:
-    Type: AWS::CloudFront::Distribution
+    Type: AWS::CloudFront::Distributions
     Properties:
       DistributionConfig:
         Comment: Cloudfront Distribution pointing to S3 bucket
