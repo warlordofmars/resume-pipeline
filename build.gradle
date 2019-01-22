@@ -120,6 +120,9 @@ task('processTestResults') {
             if(result.containsKey('systemErr')) {
                 testResultsXml = testResultsXml + "        <system-err>${result['systemErr']}</system-err>\n"
             }
+            if(result.containsKey('failure')) {
+                testResultsXml = testResultsXml + "        <failure type=\"${result['failure']['type']}\">${result['failure']['details']}</failure>\n"
+            }
             testResultsXml = testResultsXml + '    </testcase>'
         }
         testResultsXml = testResultsXml + '</testsuite>'
