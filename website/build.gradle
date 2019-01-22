@@ -34,7 +34,7 @@ task('deploy') {
             message = message + "${output['OutputKey']}: \"${output['OutputValue']}\"\n"
         }
 
-        if(stackDetails['StackStatus'] in ["CREATE_COMPLETE", "UPDATEs_COMPLETE"]) {
+        if(stackDetails['StackStatus'] in ["CREATE_COMPLETE", "UPDATE_COMPLETE"]) {
             rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Template Deployed', systemOut: message]
             println message
         } else {
