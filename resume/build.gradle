@@ -68,7 +68,7 @@ task('checkUrls') {
                 throw new GradleException("Could not connect to the URL: ${detectedURL} \nFound in ${resumeSource}\n\n${e.toString()}")
             }
         }
-        rootProject.ext.testResults << [classname: resumeSource, name: "Resume URLs Validation", systemOut: "All URLs found in ${resumeSource} are valid URLs and are currently responding:\n${URLs}"]
+        rootProject.ext.testResults << [classname: resumeSource, name: "Resume URLs Validation", systemOut: "All URLs found in ${resumeSource} are valid URLs and are currently responding:\n${URLs.join('\n')}"]
     }
 }
 
@@ -190,7 +190,7 @@ task('postDeployCheck') {
                 throw new GradleException("The ensure string \"${word}\" was not found in ${deployURL}")
             }
         }
-        rootProject.ext.testResults << [classname: resumeSource, name: 'Expected Strings Found in Deployed HTML Resume', systemOut: "Found all expected strings in deployed HTML resume at ${deployURL}:\n${ensureStrings}"]
+        rootProject.ext.testResults << [classname: resumeSource, name: 'Expected Strings Found in Deployed HTML Resume', systemOut: "Found all expected strings in deployed HTML resume at ${deployURL}:\n${ensureStrings.join('\n')}"]
         def urlList = []
         resumeFormats.each { format ->
             if("https://${getWebsiteUrl()}/resume.${format}".toURL()) {
@@ -200,7 +200,7 @@ task('postDeployCheck') {
                 throw new GradleException("The ${format} version of the resume could not be found at the deployed URL of https://${getWebsiteUrl()}/resume.${format}")
             }
         }
-        def message = "All resume formats have been deployed successfully and are currently web-accessible at the following URLs:\n${urlList}"
+        def message = "All resume formats have been deployed successfully and are currently web-accessible at the following URLs:\n${urlList.join('\n')}"
 
         rootProject.ext.testResults << [classname: resumeSource, name: "Deployed Resumes Are Web Accessible", systemOut: message]
         println "\nThe resume is confirmed to be published to ${deployURL} successfully, and can now be accessed at that URL.\n\nThe resume contains the following key strings we were looking for:\n\n${ensureStrings}\n"
