@@ -114,16 +114,22 @@ task('analyzeResume') {
     dependsOn rootProject.checkPrerequisites
     mustRunAfter validateResume, spellCheck, buildHtmlResume
     doFirst {
-        def out = new ByteArrayOutputStream()
-        exec {
-            commandLine 'hackmyresume', 'analyze', resumeSource
-            standardOutput out
+        try {
+            def out = new ByteArrayOutputStream()
+            exec {
+                commandLine 'hackmyresumes', 'analyze', resumeSource
+                standardOutput out
+            }
+            def report = out.toString()
+            file(buildDir).mkdirs()
+            file("${buildDir}/resume-analysis.txt").text = report
+            println report
+            rootProject.ext.testResults << [classname: resumeSource, name: 'Resume Content Analysis', systemOut: report]
+        } catch(Exception e) {
+            rootProject.ext.testResults << [classname: resumeSource, name: 'Resume Content Analysis', failure: [type: 'Error Generating Report', details: e.toString()]]
+            throw new GradleException(e.toString())
         }
-        def report = out.toString()
-        file(buildDir).mkdirs()
-        file("${buildDir}/resume-analysis.txt").text = report
-        println report
-        rootProject.ext.testResults << [classname: resumeSource, name: 'Resume Content Analysis', systemOut: report]
+        
     }
 }
 
