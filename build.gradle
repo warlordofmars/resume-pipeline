@@ -31,7 +31,7 @@ ext {
     domainName = 'warlordofmars.net'
     wildcardCertARN = "arn:aws:acm:us-east-1:247631471946:certificate/471106fc-e3dd-4e0b-a20f-010a6e326283"
     productionBranch = 'master'
-    ensureStrings = ['Johns A. Carter', 'johncarter@warlordofmars.net', '(770) 598-7096']
+    ensureStrings = ['John A. Carter', 'johncarter@warlordofmars.net', '(770) 598-7096']
     resumeSource = 'resume.json'
     htmlResumeTheme = 'theme/node_modules/jsonresume-theme-class/'
     pdfResumeTheme = 'theme/node_modules/jsonresume-theme-short/'
