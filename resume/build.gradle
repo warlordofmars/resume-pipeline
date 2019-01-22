@@ -117,7 +117,7 @@ task('analyzeResume') {
         try {
             def out = new ByteArrayOutputStream()
             exec {
-                commandLine 'hackmyresumes', 'analyze', resumeSource
+                commandLine 'hackmyresume', 'analyze', resumeSource
                 standardOutput out
             }
             def report = out.toString()
