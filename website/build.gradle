@@ -18,6 +18,8 @@ task('deploy') {
     dependsOn awsCfnMigrateStackAndWaitCompleted
     finalizedBy rootProject.processTestResults
     doLast {
+
+    
         def out = new ByteArrayOutputStream()
         exec {
             commandLine 'aws', 'cloudformation', 'describe-stacks', '--stack-name', getStackName()
@@ -25,10 +27,28 @@ task('deploy') {
         }
         
         def stackDetails = new JsonSlurper().parseText(out.toString())['Stacks'][0]
-        def message = "${stackDetails['StackName']} status: ${stackDetails['StackStatus']}"
-        rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Template Deployed', systemOut: message]
+        
+
+        def message = "cloudformation stack \"${stackDetails['StackName']}\" has status: \"${stackDetails['StackStatus']}\"\n\nstack created: \"${stackDetails['CreationTime']}\"\nstack last updated: \"${stackDetails['LastUpdatedTime']}\"\n\n"
+        stackDetails['Outputs'].each { output ->
+            message = message + "${output['OutputKey']}: \"${output['OutputValue']}\"\n"
+        }
+
+        if(stackDetails['StackStatus'] in ["CREATE_COMPLETE", "UPDATEs_COMPLETE"]) {
+            rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Template Deployed', systemOut: message]
+            println message
+        } else {
+            rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Template Deployed', failure: [type: 'CloudFormation Failed to Deploy', details: message]]
+            throw new GradleException(message)
+        }
+        
     }
 }
+
+awsCfnUploadTemplate.finalizedBy deploy
+awsCfnMigrateStack.finalizedBy deploy
+awsCfnWaitStackComplete.finalizedBy deploy
+awsCfnMigrateStackAndWaitCompleted.finalizedBy deploy
 
 task('delete') {
     dependsOn awsCfnDeleteStackAndWaitCompleted
