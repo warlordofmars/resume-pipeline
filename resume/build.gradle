@@ -28,7 +28,7 @@ task('validateResume') {
             throw new GradleException("Resume validation has failed:\n\n${output.toString()}")
         } else {
             println output.toString()
-            rootProject.ext.testResults << [classname: resumeSource, name: "Valid JSON Resume Schema", systemOut: output.toString()]
+            rootProject.ext.testResults << [classname: resumeSource, name: "JSON Resume Schema Validation", systemOut: output.toString()]
         }
     }
 }
@@ -68,7 +68,7 @@ task('checkUrls') {
                 throw new GradleException("Could not connect to the URL: ${detectedURL} \nFound in ${resumeSource}\n\n${e.toString()}")
             }
         }
-        rootProject.ext.testResults << [classname: resumeSource, name: "Resume URLs are Valid", systemOut: "All URLs found in ${resumeSource} are valid URLs and are currently responding:\n${URLs}"]
+        rootProject.ext.testResults << [classname: resumeSource, name: "Resume URLs Validation", systemOut: "All URLs found in ${resumeSource} are valid URLs and are currently responding:\n${URLs}"]
     }
 }
 

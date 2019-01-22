@@ -43,7 +43,7 @@ task('cfnLint') {
         exec {
             commandLine 'cfn-lint', cloudformationSource
         }
-        rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Linting / Syntax Check']
+        rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Linting / Syntax Check', systemOut: 'All Checks Passed']
     }
 }
 
