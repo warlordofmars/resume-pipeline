@@ -25,7 +25,7 @@ task('validateResume') {
             standardOutput output
         }
         if (output.toString().contains('INVALID')) {
-            rootProject.ext.testResults << [classname: resumeSource, name: "JSON Resume Schema Validation", systemOut: output.toString(), failure: [type: 'Validation Vailed', details: output.toString()]]
+            rootProject.ext.testResults << [classname: resumeSource, name: "JSON Resume Schema Validation", failure: [type: 'Validation Vailed', details: output.toString()]]
             throw new GradleException("Resume validation has failed:\n\n${output.toString()}")
         } else {
             println output.toString()
