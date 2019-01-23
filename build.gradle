@@ -3,6 +3,8 @@
  */
 
 import java.util.Random
+import groovy.xml.XmlUtil
+import groovy.xml.StreamingMarkupBuilder
 
 buildscript {
     repositories {
@@ -111,42 +113,35 @@ task('checkPrerequisites') {
 }
 
 task('processTestResults') {
-    mustRunAfter ':website:cfnLint'
     doLast {
-        registeredTests.each { test ->
-            test['skipped'] = true
+        def inFile = file("${buildDir}/report.xml")
+        def xml = new XmlSlurper().parseText(inFile.text)
+
+        xml.testsuite.each { testsuite ->
+            // println testsuite.@name
             testResults.each { result ->
-                if(result['classname'] == test['classname'] && result['name'] == test['name']) {
-                    test['skipped'] = false
+                // println "${result['name']} ${testsuite.@name}"
+                if("${result['classname']}" == "${testsuite.@classname}" && "${result['name']}" == "${testsuite.@name}") {
+                    println "Found test result: ${testsuite.@name}"
+                    testsuite.skipped.replaceNode { }
+                    if(result.containsKey('systemOut')) {
+                        testsuite.appendNode {
+                            'system-out'(result['systemOut'])
+                        }
+                    }
+                    if(result.containsKey('failure')) {
+                        testsuite.appendNode {
+                            failure(type: result['failure']['type'], details: result['failure']['details'])
+                        }
+                    }
                 }
-                
             }
-            if(test['skipped']) {
-                testResults << test
-            }
+            
         }
-        def testResultsXml = "<testsuite name=\"${gradle.startParameter.taskNames.join('-')}\" tests=\"${testResults.size()}\">\n"
-        testResults.each { result ->
-            testResultsXml = testResultsXml + "    <testcase classname=\"${result['classname']}\" name=\"${result['name']}\">\n"
-            if(result.containsKey('systemOut')) {
-                testResultsXml = testResultsXml + "        <system-out>${result['systemOut']}</system-out>\n"
-            }
-            if(result.containsKey('systemErr')) {
-                testResultsXml = testResultsXml + "        <system-err>${result['systemErr']}</system-err>\n"
-            }
-            if(result.containsKey('failure')) {
-                testResultsXml = testResultsXml + "        <failure type=\"${result['failure']['type']}\">${result['failure']['details']}</failure>\n"
-            }
-            if(result.containsKey('skipped') && result['skipped']) {
-                testResultsXml = testResultsXml + "        <skipped/>\n"
-            }
-            testResultsXml = testResultsXml + '    </testcase>'
+
+        inFile.withWriter { outWriter ->
+            XmlUtil.serialize( new StreamingMarkupBuilder().bind{ mkp.yield xml }, outWriter )
         }
-        testResultsXml = testResultsXml + '</testsuite>'
-        file("${buildDir}/tests").mkdirs()
-        def random = new Random()
-        def randomNumber = random.nextInt() & Integer.MAX_VALUE
-        file("${buildDir}/tests/results-${randomNumber}.xml").text = testResultsXml
     }
 }
 
@@ -183,15 +178,24 @@ class Test {
 
 task('registerTests') {
     doFirst {
-        subprojects.each {
-            if(it.hasProperty('tests')) {
-                it.tests.each { name, test ->
-                    if(test[2] in gradle.startParameter.taskNames) {
+        def sw = new StringWriter()
+        def xml = new groovy.xml.MarkupBuilder(sw)
+        xml.testsuites {
+            subprojects.each {
+                if(it.hasProperty('tests')) {
+                    it.tests.each { name, test ->
                         project.ext."${name}" = new Test(test[0], test[1], test[2], project)
+                        testsuite(classname: test[0], name: test[1]) {
+                            skipped()
+                        }
+                    
                     }
                 }
             }
         }
+        file("${buildDir}").mkdirs()
+        file("${buildDir}/report.xml").write(sw.toString())
+        
     }
     
 }
