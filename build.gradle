@@ -39,6 +39,7 @@ ext {
     resumeFormats = ['html', 'pdf', 'yml', 'md']
     productionNumberOfCopies = 10
     testResults = []
+    registeredTests = []
 }
 
 if (!project.hasProperty('previewHtmlFileName')) {
@@ -80,6 +81,7 @@ def getNumberOfCopies() {
     return ( isProd() ? productionNumberOfCopies : 1 )
 }
 
+
 ext.stackName = getStackName()
 ext.websiteUrl = getWebsiteUrl()
 
@@ -111,6 +113,18 @@ task('checkPrerequisites') {
 task('processTestResults') {
     mustRunAfter ':website:cfnLint'
     doLast {
+        registeredTests.each { test ->
+            test['skipped'] = true
+            testResults.each { result ->
+                if(result['classname'] == test['classname'] && result['name'] == test['name']) {
+                    test['skipped'] = false
+                }
+                
+            }
+            if(test['skipped']) {
+                testResults << test
+            }
+        }
         def testResultsXml = "<testsuite name=\"${gradle.startParameter.taskNames.join('-')}\" tests=\"${testResults.size()}\">\n"
         testResults.each { result ->
             testResultsXml = testResultsXml + "    <testcase classname=\"${result['classname']}\" name=\"${result['name']}\">\n"
@@ -122,6 +136,9 @@ task('processTestResults') {
             }
             if(result.containsKey('failure')) {
                 testResultsXml = testResultsXml + "        <failure type=\"${result['failure']['type']}\">${result['failure']['details']}</failure>\n"
+            }
+            if(result.containsKey('skipped') && result['skipped']) {
+                testResultsXml = testResultsXml + "        <skipped/>\n"
             }
             testResultsXml = testResultsXml + '    </testcase>'
         }
@@ -135,4 +152,41 @@ task('processTestResults') {
 
 task('clean', type:Delete) {
     delete buildDir
+}
+
+class Test {
+    String name
+    String classname
+    Project project
+    
+    Test(classname, name, project) {
+        this.classname = classname
+        this.name = name
+        this.project = project
+        this.project.ext.registeredTests << [classname: this.classname, name: this.name]
+    }
+
+    void success(String output) {
+        this.project.ext.testResults << [classname: this.classname, name: name, systemOut: output]
+    }
+
+    void failure(String type, String output) {
+        this.project.ext.testResults << [classname: this.classname, name: name, failure: [type: type, details: output]]
+    }
+}
+
+// ext.cfnTemplateDeployedTest = new Test(cloudformationSource, 'Resume Website CloudFormation Template Deployed', project)
+// ext.cfnLintTest = new Test(cloudformationSource, 'Resume Website CloudF
+
+task('registerTests') {
+    doFirst {
+        subprojects.each {
+            if(it.hasProperty('tests')) {
+                it.tests.each { name, test ->
+                    project.ext."${name}" = new Test(test[0], test[1], project)
+                }
+            }
+        }
+    }
+    
 }

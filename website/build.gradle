@@ -14,8 +14,9 @@ cloudFormation {
     ])
 }
 
+
 task('deploy') {
-    dependsOn awsCfnMigrateStackAndWaitCompleted
+    dependsOn awsCfnMigrateStackAndWaitCompleted, rootProject.registerTests
     finalizedBy rootProject.processTestResults
     doLast {
 
@@ -35,15 +36,17 @@ task('deploy') {
         }
 
         if(stackDetails['StackStatus'] in ["CREATE_COMPLETE", "UPDATE_COMPLETE"]) {
-            rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Template Deployed', systemOut: message]
+            cfnTemplateDeployedTest.success(message)
             println message
         } else {
-            rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Template Deployed', failure: [type: 'CloudFormation Failed to Deploy', details: message]]
+            cfnTemplateDeployedTest.failure('CloudFormation Failed to Deploy', message)
             throw new GradleException(message)
         }
         
     }
 }
+
+
 
 awsCfnUploadTemplate.finalizedBy deploy
 awsCfnMigrateStack.finalizedBy deploy
@@ -57,7 +60,7 @@ task('delete') {
 awsCfnMigrateStack.dependsOn awsCfnUploadTemplate
 
 task('cfnLint') {
-    dependsOn rootProject.checkPrerequisites
+    dependsOn rootProject.checkPrerequisites, rootProject.registerTests
     finalizedBy rootProject.processTestResults
     doFirst {
         def out = new ByteArrayOutputStream()
@@ -67,16 +70,16 @@ task('cfnLint') {
             ignoreExitValue true
         }
         if(result.getExitValue() == 0) {
-            rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Linting / Syntax Check', systemOut: 'All Checks Passed']
+            cfnLintTest.success('All Checks Passed')
         } else {
-            rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Linting / Syntax Check', failure: [type: 'CloudFormation Syntax Error', details: out.toString()]]
+            cfnLintTest.failure('CloudFormation Syntax Error', out.toString())
             throw new GradleException(out.toString())
         }
     }
 }
 
 task('cfnNag') {
-    dependsOn rootProject.checkPrerequisites
+    dependsOn rootProject.checkPrerequisites, rootProject.registerTests
     finalizedBy rootProject.processTestResults
     doFirst {
         def out = new ByteArrayOutputStream()
@@ -86,10 +89,10 @@ task('cfnNag') {
             ignoreExitValue true
         }
         if(result.getExitValue() == 0) {
-            rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Best Practices', systemOut: out.toString()]
+            // cfnNagTest.success(out.toString())
             println out.toString()
         } else {
-            rootProject.ext.testResults << [classname: cloudformationSource, name: 'Resume Website CloudFormation Best Practices', failure: [type: 'Not Adhering to CloudFormation Best Practices', details: out.toString()]]
+            // cfnNagTest.failure('Not Adhering to CloudFormation Best Practices', out.toString())
             throw new GradleException(out.toString())
         }
         
@@ -99,3 +102,9 @@ task('cfnNag') {
 task('build') {
     dependsOn cfnLint, cfnNag
 }
+
+ext.tests = [
+    cfnTemplateDeployedTest: [cloudformationSource, 'Resume Website CloudFormation Template Deployed'],
+    cfnLintTest: [cloudformationSource, 'Resume Website CloudFormation Linting / Syntax Check'],
+    cfnNagTest: [cloudformationSource, 'Resume Website CloudFormation Best Practices'],
+]

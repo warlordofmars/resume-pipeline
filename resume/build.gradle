@@ -17,7 +17,7 @@ def buildResume(format) {
 
 task('validateResume') {
     finalizedBy rootProject.processTestResults
-    dependsOn rootProject.checkPrerequisites
+    dependsOn rootProject.checkPrerequisites, rootProject.registerTests
     doFirst {
         def output = new ByteArrayOutputStream()
         exec {
@@ -25,11 +25,11 @@ task('validateResume') {
             standardOutput output
         }
         if (output.toString().contains('INVALID')) {
-            rootProject.ext.testResults << [classname: resumeSource, name: "JSON Resume Schema Validation", failure: [type: 'Validation Vailed', details: output.toString()]]
+            jsonSchemaValidationTest.failure('Validation Vailed', output.toString())
             throw new GradleException("Resume validation has failed:\n\n${output.toString()}")
         } else {
             println output.toString()
-            rootProject.ext.testResults << [classname: resumeSource, name: "JSON Resume Schema Validation", systemOut: output.toString()]
+            jsonSchemaValidationTest.success(output.toString())
         }
     }
 }
@@ -37,7 +37,7 @@ task('validateResume') {
 task('spellCheck') {
     finalizedBy rootProject.processTestResults
     mustRunAfter validateResume
-    dependsOn rootProject.checkPrerequisites
+    dependsOn rootProject.checkPrerequisites, rootProject.registerTests
     doFirst {
         def out = new ByteArrayOutputStream()
         exec {
@@ -48,11 +48,11 @@ task('spellCheck') {
         def errors = out.toString().readLines()
         if (errors.size() > 0) {
             def message = "There were ${errors.size()} words misspelled in ${resumeSource}:\n\n${errors}"
-            rootProject.ext.testResults << [classname: resumeSource, name: 'Resume Spell Check', failure: [type: 'Mis-spelled Word', details: message]]
+            spellCheckTest.failure('Mis-spelled Word', message)
             throw new GradleException(message)
         }
         def message = "No spelling errors detected in ${resumeSource}"
-        rootProject.ext.testResults << [classname: resumeSource, name: 'Resume Spell Check', systemOut: message]
+        spellCheckTest.success(message)
         print message
     }
 }
@@ -60,6 +60,7 @@ task('spellCheck') {
 task('checkUrls') {
     finalizedBy rootProject.processTestResults
     mustRunAfter validateResume
+    dependsOn rootProject.registerTests
     doFirst {
         def URLs = file(resumeSource).text.findAll('http[s]?://[a-zA-Z0-9./-]+')
         URLs.each { detectedURL ->
@@ -69,11 +70,11 @@ task('checkUrls') {
                 
             } catch(Exception e) {
                 def message = "Could not connect to the URL: ${detectedURL} \nFound in ${resumeSource}\n\n${e.toString()}"
-                rootProject.ext.testResults << [classname: resumeSource, name: "Resume URLs Validation", failure: [type: 'Bad URL Found', details: message]]
+                resumeUrlCheckTest.failure('Bad URL Found', message)
                 throw new GradleException(message)
             }
         }
-        rootProject.ext.testResults << [classname: resumeSource, name: "Resume URLs Validation", systemOut: "All URLs found in ${resumeSource} are valid URLs and are currently responding:\n\n${URLs.join('\n')}"]
+        resumeUrlCheckTest.success("All URLs found in ${resumeSource} are valid URLs and are currently responding:\n\n${URLs.join('\n')}")
     }
 }
 
@@ -111,7 +112,7 @@ resumeFormats.each { format ->
 
 task('analyzeResume') {
     finalizedBy rootProject.processTestResults
-    dependsOn rootProject.checkPrerequisites
+    dependsOn rootProject.registerTests, rootProject.checkPrerequisites
     mustRunAfter validateResume, spellCheck, buildHtmlResume
     doFirst {
         try {
@@ -124,12 +125,11 @@ task('analyzeResume') {
             file(buildDir).mkdirs()
             file("${buildDir}/resume-analysis.txt").text = report
             println report
-            rootProject.ext.testResults << [classname: resumeSource, name: 'Resume Content Analysis', systemOut: report]
+            resumeContentAnalysis.success(report)
         } catch(Exception e) {
-            rootProject.ext.testResults << [classname: resumeSource, name: 'Resume Content Analysis', failure: [type: 'Error Generating Report', details: e.toString()]]
+            resumeContentAnalysis.failure('Error Generating Report', e.toString())
             throw new GradleException(e.toString())
         }
-        
     }
 }
 
@@ -193,17 +193,18 @@ task('publishResume') {
 task('postDeployCheck') {
     finalizedBy rootProject.processTestResults
     mustRunAfter publishResume
+    dependsOn rootProject.registerTests
     doFirst {
         def deployURL = "https://${getWebsiteUrl()}/${getHtmlResumeName()}"
         def content = deployURL.toURL().text
         ensureStrings.each { word ->
             if (!content.contains(word)) {
                 def message = "The ensure string \"${word}\" was not found in ${deployURL}"
-                rootProject.ext.testResults << [classname: resumeSource, name: 'Expected Strings Found in Deployed HTML Resume', failure: [type: 'Expected String Not Found', details: message]]
+                ensureStringsTest.failure('Expected String Not Found', message)
                 throw new GradleException(message)
             }
         }
-        rootProject.ext.testResults << [classname: resumeSource, name: 'Expected Strings Found in Deployed HTML Resume', systemOut: "Found all expected strings in deployed HTML resume at ${deployURL}:\n\n${ensureStrings.join('\n')}"]
+        ensureStringsTest.success("Found all expected strings in deployed HTML resume at ${deployURL}:\n\n${ensureStrings.join('\n')}")
         def urlList = []
         resumeFormats.each { format ->
             def url = "https://${getWebsiteUrl()}/resume.${format}"
@@ -213,13 +214,13 @@ task('postDeployCheck') {
                 urlList << url
             } catch(Exception e) {
                 def message = "The ${format} version of the resume could not be found at the deployed URL of ${url}\n\n${e.toString()}"
-                rootProject.ext.testResults << [classname: resumeSource, name: "Deployed Resumes Are Web Accessible", failure: [type: 'Deployed Resume Not Accessible', details: message]]
+                deployedResumeTest.failure('Deployed Resume Not Accessible', message)
                 throw new GradleException(message)
             }
         }
         def message = "All resume formats have been deployed successfully and are currently web-accessible at the following URLs:\n\n${urlList.join('\n')}"
 
-        rootProject.ext.testResults << [classname: resumeSource, name: "Deployed Resumes Are Web Accessible", systemOut: message]
+        deployedResumeTest.success(message)
         println "\nThe resume is confirmed to be published to ${deployURL} successfully, and can now be accessed at that URL.\n\nThe resume contains the following key strings we were looking for:\n\n${ensureStrings}\n"
     }
 }
@@ -227,3 +228,13 @@ task('postDeployCheck') {
 task('deploy') {
     dependsOn publishResume, postDeployCheck
 }
+
+ext.tests = [
+
+    ensureStringsTest: [resumeSource, 'Expected Strings Found in Deployed HTML Resume'],
+    deployedResumeTest: [resumeSource, 'Deployed Resumes Are Web Accessible'],
+    resumeContentAnalysis: [resumeSource, 'Resume Content Analysis'],
+    resumeUrlCheckTest: [resumeSource, 'Resume URLs Validation'],
+    spellCheckTest: [resumeSource, 'Resume Spell Check'],
+    jsonSchemaValidationTest: [resumeSource, 'JSON Resume Schema Validation'],
+]
