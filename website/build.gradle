@@ -89,10 +89,10 @@ task('cfnNag') {
             ignoreExitValue true
         }
         if(result.getExitValue() == 0) {
-            // cfnNagTest.success(out.toString())
+            cfnNagTest.success(out.toString())
             println out.toString()
         } else {
-            // cfnNagTest.failure('Not Adhering to CloudFormation Best Practices', out.toString())
+            cfnNagTest.failure('Not Adhering to CloudFormation Best Practices', out.toString())
             throw new GradleException(out.toString())
         }
         
