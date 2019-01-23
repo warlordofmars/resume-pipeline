@@ -157,12 +157,15 @@ task('clean', type:Delete) {
 class Test {
     String name
     String classname
+    String rootTask
     Project project
     
-    Test(classname, name, project) {
+    Test(classname, name, rootTask, project) {
         this.classname = classname
         this.name = name
+        this.rootTask = rootTask
         this.project = project
+
         this.project.ext.registeredTests << [classname: this.classname, name: this.name]
     }
 
@@ -183,7 +186,9 @@ task('registerTests') {
         subprojects.each {
             if(it.hasProperty('tests')) {
                 it.tests.each { name, test ->
-                    project.ext."${name}" = new Test(test[0], test[1], project)
+                    if(test[2] in gradle.startParameter.taskNames) {
+                        project.ext."${name}" = new Test(test[0], test[1], test[2], project)
+                    }
                 }
             }
         }
