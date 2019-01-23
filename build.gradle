@@ -117,21 +117,25 @@ task('processTestResults') {
         def inFile = file("${buildDir}/report.xml")
         def xml = new XmlSlurper().parseText(inFile.text)
 
+        println xml.testsuite.size()
+
         xml.testsuite.each { testsuite ->
-            // println testsuite.@name
-            testResults.each { result ->
-                // println "${result['name']} ${testsuite.@name}"
-                if("${result['classname']}" == "${testsuite.@classname}" && "${result['name']}" == "${testsuite.@name}") {
-                    println "Found test result: ${testsuite.@name}"
-                    testsuite.skipped.replaceNode { }
-                    if(result.containsKey('systemOut')) {
-                        testsuite.appendNode {
-                            'system-out'(result['systemOut'])
+
+            
+            testsuite.testcase.each { testcase ->
+                testResults.each { result ->
+                    if("${result['classname']}" == "${testcase.@classname}" && "${result['name']}" == "${testcase.@name}") {
+                        println "Found test result: ${testcase.@name}"
+                        testcase.skipped.replaceNode { }
+                        if(result.containsKey('systemOut')) {
+                            testcase.appendNode {
+                                'system-out'(result['systemOut'])
+                            }
                         }
-                    }
-                    if(result.containsKey('failure')) {
-                        testsuite.appendNode {
-                            failure(type: result['failure']['type'], details: result['failure']['details'])
+                        if(result.containsKey('failure')) {
+                            testcase.appendNode {
+                                failure(type: result['failure']['type'], details: result['failure']['details'])
+                            }
                         }
                     }
                 }
@@ -140,7 +144,7 @@ task('processTestResults') {
         }
 
         inFile.withWriter { outWriter ->
-            XmlUtil.serialize( new StreamingMarkupBuilder().bind{ mkp.yield xml }, outWriter )
+            XmlUtil.serialize(xml, outWriter)
         }
     }
 }
@@ -181,15 +185,18 @@ task('registerTests') {
         def sw = new StringWriter()
         def xml = new groovy.xml.MarkupBuilder(sw)
         xml.testsuites {
-            subprojects.each {
-                if(it.hasProperty('tests')) {
-                    it.tests.each { name, test ->
-                        project.ext."${name}" = new Test(test[0], test[1], test[2], project)
-                        testsuite(classname: test[0], name: test[1]) {
-                            skipped()
+            subprojects.each { p ->
+                if(p.hasProperty('tests')) {
+                    testsuite(tests: p.tests.size()) {
+                        p.tests.each { name, test ->
+                            project.ext."${name}" = new Test(test[0], test[1], test[2], project)
+                            testcase(classname: test[0], name: test[1]) {
+                                skipped()
+                            }
+                        
                         }
-                    
                     }
+                    
                 }
             }
         }
