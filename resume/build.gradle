@@ -15,9 +15,23 @@ def buildResume(format) {
     }
 }
 
+task('validateJson') {
+    finalizedBy rootProject.processTestResults
+    dependsOn rootProject.registerTests
+    doLast {
+        try {
+            new JsonSlurper().parseText(file(resumeSource).text)
+            jsonSyntaxValidationTest.success("Valid JSON!")
+        } catch(Exception e) {
+            jsonSyntaxValidationTest.failure('JSON Syntax Error', e.toString())
+            throw new GradleException("JSON Syntax Error in ${resumeSource}:\n\n${e.toString()}")
+        }
+    }
+}
+
 task('validateResume') {
     finalizedBy rootProject.processTestResults
-    dependsOn rootProject.checkPrerequisites, rootProject.registerTests
+    dependsOn validateJson, rootProject.checkPrerequisites, rootProject.registerTests
     doFirst {
         def output = new ByteArrayOutputStream()
         exec {
@@ -237,4 +251,5 @@ ext.tests = [
     resumeUrlCheckTest: [resumeSource, 'Resume URLs Validation', 'build'],
     spellCheckTest: [resumeSource, 'Resume Spell Check', 'build'],
     jsonSchemaValidationTest: [resumeSource, 'JSON Resume Schema Validation', 'build'],
+    jsonSyntaxValidationTest: [resumeSource, 'JSON Syntax Validation', 'build']
 ]
