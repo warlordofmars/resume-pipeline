@@ -1,11 +1,10 @@
 pipeline {
   agent any
+  environment {
+    PATH = "/usr/local/bin:$PATH"
+  }
   stages {
-    
-    environment {
-      PATH = "/usr/local/bin:$PATH"
-    }
-  
+
     stage('build') {
       steps {
         sh './gradlew build'
