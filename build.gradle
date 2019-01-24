@@ -182,6 +182,7 @@ class Test {
 
 task('registerTests') {
     doFirst {
+        
         def sw = new StringWriter()
         def xml = new groovy.xml.MarkupBuilder(sw)
         xml.testsuites {
@@ -200,9 +201,12 @@ task('registerTests') {
                 }
             }
         }
-        file("${buildDir}").mkdirs()
-        file("${buildDir}/report.xml").write(sw.toString())
-        
+
+        def reportFile = file("${buildDir}/report.xml")
+        if(!reportFile.exists()) {
+            file("${buildDir}").mkdirs()
+            reportFile.write(sw.toString())
+        }
     }
     
 }
