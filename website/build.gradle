@@ -1,7 +1,14 @@
 import groovy.json.JsonSlurper
 
 apply plugin: 'jp.classmethod.aws.cloudformation'
-    
+
+
+ext.tests = [
+    cfnTemplateDeployedTest: [cloudformationSource, 'Resume Website CloudFormation Template Deployed'],
+    cfnLintTest: [cloudformationSource, 'Resume Website CloudFormation Linting / Syntax Check'],
+    cfnNagTest: [cloudformationSource, 'Resume Website CloudFormation Best Practices'],
+]
+
 cloudFormation {
     stackName "${rootProject.ext.stackName}"
     templateFile file(cloudformationSource)
@@ -20,7 +27,6 @@ task('deploy') {
     finalizedBy rootProject.processTestResults
     doLast {
 
-    
         def out = new ByteArrayOutputStream()
         exec {
             commandLine 'aws', 'cloudformation', 'describe-stacks', '--stack-name', getStackName()
@@ -45,8 +51,6 @@ task('deploy') {
         
     }
 }
-
-
 
 awsCfnUploadTemplate.finalizedBy deploy
 awsCfnMigrateStack.finalizedBy deploy
@@ -103,8 +107,3 @@ task('build') {
     dependsOn cfnLint, cfnNag
 }
 
-ext.tests = [
-    cfnTemplateDeployedTest: [cloudformationSource, 'Resume Website CloudFormation Template Deployed'],
-    cfnLintTest: [cloudformationSource, 'Resume Website CloudFormation Linting / Syntax Check'],
-    cfnNagTest: [cloudformationSource, 'Resume Website CloudFormation Best Practices'],
-]

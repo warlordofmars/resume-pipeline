@@ -120,9 +120,7 @@ task('processTestResults') {
         def xml = new XmlSlurper().parseText(reportFile.text)
 
         xml.testsuite.each { testsuite ->
-            
             testsuite.testcase.each { testcase ->
-                
                 subprojects.each { p ->
                     if(p.hasProperty('tests')) {
                         p.tests.each { name, test ->

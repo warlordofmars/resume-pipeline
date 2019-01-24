@@ -3,6 +3,20 @@ import groovy.json.JsonSlurper
 import groovy.json.JsonBuilder
 import java.util.TimeZone
 
+
+ext.tests = [
+
+    ensureStringsTest: [resumeSource, 'Expected Strings Found in Deployed HTML Resume'],
+    deployedResumeTest: [resumeSource, 'Deployed Resumes Are Web Accessible'],
+    resumeContentAnalysis: [resumeSource, 'Resume Content Analysis'],
+    resumeUrlCheckTest: [resumeSource, 'Resume URLs Validation'],
+    spellCheckTest: [resumeSource, 'Resume Spell Check'],
+    jsonSchemaValidationTest: [resumeSource, 'JSON Resume Schema Validation'],
+    jsonSyntaxValidationTest: [resumeSource, 'JSON Syntax Validation']
+
+]
+
+
 def buildResumeWithTheme(format, theme) {
     exec {
         commandLine 'hackmyresume', 'build', "${buildDir}/${resumeSource}", 'TO', "${buildDir}/resume.${format}", '-t', theme
@@ -91,7 +105,6 @@ task('checkUrls') {
         resumeUrlCheckTest.success("All URLs found in ${resumeSource} are valid URLs and are currently responding:\n\n${URLs.join('\n')}")
     }
 }
-
 
 task('buildResume') {
     mustRunAfter checkUrls, spellCheck
@@ -203,7 +216,6 @@ task('publishResume') {
     }
 }
 
-
 task('postDeployCheck') {
     finalizedBy rootProject.processTestResults
     mustRunAfter publishResume
@@ -242,15 +254,3 @@ task('postDeployCheck') {
 task('deploy') {
     dependsOn publishResume, postDeployCheck
 }
-
-ext.tests = [
-
-    ensureStringsTest: [resumeSource, 'Expected Strings Found in Deployed HTML Resume'],
-    deployedResumeTest: [resumeSource, 'Deployed Resumes Are Web Accessible'],
-    resumeContentAnalysis: [resumeSource, 'Resume Content Analysis'],
-    resumeUrlCheckTest: [resumeSource, 'Resume URLs Validation'],
-    spellCheckTest: [resumeSource, 'Resume Spell Check'],
-    jsonSchemaValidationTest: [resumeSource, 'JSON Resume Schema Validation'],
-    jsonSyntaxValidationTest: [resumeSource, 'JSON Syntax Validation']
-
-]
