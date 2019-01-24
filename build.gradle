@@ -120,18 +120,26 @@ task('processTestResults') {
         xml.testsuite.each { testsuite ->
             
             testsuite.testcase.each { testcase ->
-                testResults.each { result ->
-                    if("${result['classname']}" == "${testcase.@classname}" && "${result['name']}" == "${testcase.@name}") {
-                        println "Found test result: ${testcase.@name}"
-                        testcase.skipped.replaceNode { }
-                        if(result.containsKey('systemOut')) {
-                            testcase.appendNode {
-                                'system-out'(result['systemOut'])
-                            }
-                        }
-                        if(result.containsKey('failure')) {
-                            testcase.appendNode {
-                                failure(type: result['failure']['type'], details: result['failure']['details'])
+                
+                subprojects.each { p ->
+                    if(p.hasProperty('tests')) {
+                        p.tests.each { name, test ->
+                            def testObj = project.ext."${name}"
+                            if(!testObj.skipped) {
+                                if("${testObj.classname}" == "${testcase.@classname}" && "${testObj.name}" == "${testcase.@name}") {
+                                    println "Found test result: ${testcase.@name}"
+                                    testcase.skipped.replaceNode { }
+                                    if(testObj.output) {
+                                        testcase.appendNode {
+                                            'system-out'(testObj.output)
+                                        }
+                                    }
+                                    if(!testObj.success) {
+                                        testcase.appendNode {
+                                            failure(type: testObj.failureType, details: testObj.output)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -144,7 +152,7 @@ task('processTestResults') {
         }
 
         println "\nSaved generated test report file to: ${reportFile}"
-        println cfnNagTest.toString()
+        
     }
 }
 
@@ -153,26 +161,31 @@ task('clean', type:Delete) {
 }
 
 class Test {
+
     String name
     String classname
-    String rootTask
-    Project project
+    Boolean skipped
+    Boolean success
+    String output
+    String failureType
     
-    Test(classname, name, rootTask, project) {
+    Test(classname, name) {
         this.classname = classname
         this.name = name
-        this.rootTask = rootTask
-        this.project = project
-
-        this.project.ext.registeredTests << [classname: this.classname, name: this.name]
+        this.skipped = true
     }
 
     void success(String output) {
-        this.project.ext.testResults << [classname: this.classname, name: name, systemOut: output]
+        this.skipped = false
+        this.success = true
+        this.output = output
     }
 
     void failure(String type, String output) {
-        this.project.ext.testResults << [classname: this.classname, name: name, failure: [type: type, details: output]]
+        this.skipped = false
+        this.success = false
+        this.output = output
+        this.failureType = type
     }
 }
 
@@ -186,7 +199,7 @@ task('registerTests') {
                 if(p.hasProperty('tests')) {
                     testsuite(tests: p.tests.size()) {
                         p.tests.each { name, test ->
-                            project.ext."${name}" = new Test(test[0], test[1], test[2], project)
+                            project.ext."${name}" = new Test(test[0], test[1])
                             testcase(classname: test[0], name: test[1]) {
                                 skipped()
                             }

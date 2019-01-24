@@ -104,7 +104,7 @@ task('build') {
 }
 
 ext.tests = [
-    cfnTemplateDeployedTest: [cloudformationSource, 'Resume Website CloudFormation Template Deployed', 'deploy'],
-    cfnLintTest: [cloudformationSource, 'Resume Website CloudFormation Linting / Syntax Check', 'build'],
-    cfnNagTest: [cloudformationSource, 'Resume Website CloudFormation Best Practices', 'build'],
+    cfnTemplateDeployedTest: [cloudformationSource, 'Resume Website CloudFormation Template Deployed'],
+    cfnLintTest: [cloudformationSource, 'Resume Website CloudFormation Linting / Syntax Check'],
+    cfnNagTest: [cloudformationSource, 'Resume Website CloudFormation Best Practices'],
 ]

@@ -245,11 +245,12 @@ task('deploy') {
 
 ext.tests = [
 
-    ensureStringsTest: [resumeSource, 'Expected Strings Found in Deployed HTML Resume', 'deploy'],
-    deployedResumeTest: [resumeSource, 'Deployed Resumes Are Web Accessible', 'deploy'],
-    resumeContentAnalysis: [resumeSource, 'Resume Content Analysis', 'build'],
-    resumeUrlCheckTest: [resumeSource, 'Resume URLs Validation', 'build'],
-    spellCheckTest: [resumeSource, 'Resume Spell Check', 'build'],
-    jsonSchemaValidationTest: [resumeSource, 'JSON Resume Schema Validation', 'build'],
-    jsonSyntaxValidationTest: [resumeSource, 'JSON Syntax Validation', 'build']
+    ensureStringsTest: [resumeSource, 'Expected Strings Found in Deployed HTML Resume'],
+    deployedResumeTest: [resumeSource, 'Deployed Resumes Are Web Accessible'],
+    resumeContentAnalysis: [resumeSource, 'Resume Content Analysis'],
+    resumeUrlCheckTest: [resumeSource, 'Resume URLs Validation'],
+    spellCheckTest: [resumeSource, 'Resume Spell Check'],
+    jsonSchemaValidationTest: [resumeSource, 'JSON Resume Schema Validation'],
+    jsonSyntaxValidationTest: [resumeSource, 'JSON Syntax Validation']
+
 ]
