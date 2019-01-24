@@ -77,7 +77,8 @@ task('checkPrerequisites') {
             'aws': 'Install via \'brew install awscli\'',
             'wkhtmltopdf': 'Install via \'brew install wkhtmltopdf\'',
             'cfn-lint': 'Install via \'pip install cfn-lint\'',
-            'cfn_nag_scan': 'Install via \'gem install cfn-nag\''
+            'cfn_nag_scan': 'Install via \'gem install cfn-nag\'',
+            'gdrive': 'Install via \'brew install gdrive\'',
         ]
         prerequisites.each { prerequisite, installNotes ->
             def checkPrereq = exec {

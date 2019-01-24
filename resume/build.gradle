@@ -183,8 +183,7 @@ task('printPreview') {
     }
 }
 
-task('publishResume') {
-    finalizedBy rootProject.processTestResults
+task('publishResumeToWeb') {
     mustRunAfter build
     dependsOn ':website:deploy', rootProject.checkPrerequisites
     doFirst {
@@ -205,9 +204,44 @@ task('publishResume') {
     }
 }
 
+task('publishResumeToGoogle') {
+    mustRunAfter build
+    dependsOn rootProject.checkPrerequisites
+    doLast {
+
+        def out = new ByteArrayOutputStream()
+        exec {
+            commandLine 'gdrive', 'list', '--no-header', '-q', "name = 'resume.v${rootProject.version}.pdf'"
+            standardOutput out
+        }
+
+        out.toString().readLines().each {
+            def fileId = it.split(" ")[0]
+            exec {
+                commandLine 'gdrive', 'delete', fileId
+            }
+        }
+
+
+        exec {
+            commandLine 'gdrive', 'upload', '--name', "resume.v${rootProject.version}.pdf", "${buildDir}/resume.pdf"
+        }
+    }
+}
+
+task('publishResumeToApple') {
+    mustRunAfter build
+    dependsOn rootProject.checkPrerequisites
+    doLast {
+        exec {
+            commandLine 'cp', "${buildDir}/resume.pdf", "${System.env.HOME}/Library/Mobile Documents/com~apple~CloudDocs/resume.v${rootProject.version}.pdf"
+        }
+    }
+}
+
 task('postDeployCheck') {
     finalizedBy rootProject.processTestResults
-    mustRunAfter publishResume
+    mustRunAfter publishResumeToWeb
     dependsOn rootProject.registerTests
     doFirst {
         def deployURL = "https://${getWebsiteUrl()}${getPrefix()}/"
@@ -234,5 +268,5 @@ task('postDeployCheck') {
 }
 
 task('deploy') {
-    dependsOn publishResume, postDeployCheck
+    dependsOn publishResumeToWeb, publishResumeToApple, publishResumeToGoogle, postDeployCheck    
 }
