@@ -46,7 +46,7 @@ ext {
 }
 
 def getPrefix() {
-    return ( System.env.containsKey('PROMOTE') ? '' : "${version}")
+    return ( System.env.containsKey('PROMOTE') ? '' : "/${version}")
 }
 
 def getWebsiteUrl() {

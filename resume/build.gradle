@@ -190,16 +190,16 @@ task('publishResume') {
     doFirst {
 
         exec {
-            commandLine 'aws', 's3', 'cp', "${buildDir}/resume.html", "s3://${getWebsiteUrl()}/${getPrefix()}/index.html"
+            commandLine 'aws', 's3', 'cp', "${buildDir}/resume.html", "s3://${getWebsiteUrl()}${getPrefix()}/index.html"
         }
 
         exec {
-            commandLine 'aws', 's3', 'cp', "${buildDir}/resume-analysis.txt", "s3://${getWebsiteUrl()}/${getPrefix()}/"
+            commandLine 'aws', 's3', 'cp', "${buildDir}/resume-analysis.txt", "s3://${getWebsiteUrl()}${getPrefix()}/"
         }
 
         resumeFormats.each { format ->
             exec {
-                commandLine 'aws', 's3', 'cp', "${buildDir}/resume.${format}", "s3://${getWebsiteUrl()}/${getPrefix()}/resume.${format}"
+                commandLine 'aws', 's3', 'cp', "${buildDir}/resume.${format}", "s3://${getWebsiteUrl()}${getPrefix()}/resume.${format}"
             }
         }
     }
@@ -210,7 +210,7 @@ task('postDeployCheck') {
     mustRunAfter publishResume
     dependsOn rootProject.registerTests
     doFirst {
-        def deployURL = "https://${getWebsiteUrl()}/${getPrefix()}/"
+        def deployURL = "https://${getWebsiteUrl()}${getPrefix()}/"
         def content = deployURL.toURL().text
         ensureStrings.each { word ->
             if (!content.contains(word)) {
@@ -220,7 +220,7 @@ task('postDeployCheck') {
         ensureStringsTest.success("Found all expected strings in deployed HTML resume at ${deployURL}:\n\n${ensureStrings.join('\n')}")
         def urlList = []
         resumeFormats.each { format ->
-            def url = "https://${getWebsiteUrl()}/${getPrefix()}/resume.${format}"
+            def url = "https://${getWebsiteUrl()}${getPrefix()}/resume.${format}"
             try {
                 def test = url.toURL().text
                 println "Found deployed ${format} resume at ${url}"                
