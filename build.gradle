@@ -177,6 +177,7 @@ class Test {
         this.skipped = false
         this.success = true
         this.output = output
+        println output
     }
 
     void failure(String type, String output) {
@@ -184,6 +185,7 @@ class Test {
         this.success = false
         this.output = output
         this.failureType = type
+        throw new GradleException("${this.failureType}:\n${this.output}")
     }
 }
 

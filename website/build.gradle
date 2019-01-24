@@ -43,10 +43,8 @@ task('deploy') {
 
         if(stackDetails['StackStatus'] in ["CREATE_COMPLETE", "UPDATE_COMPLETE"]) {
             cfnTemplateDeployedTest.success(message)
-            println message
         } else {
             cfnTemplateDeployedTest.failure('CloudFormation Failed to Deploy', message)
-            throw new GradleException(message)
         }
         
     }
@@ -77,7 +75,6 @@ task('cfnLint') {
             cfnLintTest.success('All Checks Passed')
         } else {
             cfnLintTest.failure('CloudFormation Syntax Error', out.toString())
-            throw new GradleException(out.toString())
         }
     }
 }
@@ -94,10 +91,8 @@ task('cfnNag') {
         }
         if(result.getExitValue() == 0) {
             cfnNagTest.success(out.toString())
-            println out.toString()
         } else {
             cfnNagTest.failure('Not Adhering to CloudFormation Best Practices', out.toString())
-            throw new GradleException(out.toString())
         }
         
     }

@@ -38,7 +38,6 @@ task('validateJson') {
             jsonSyntaxValidationTest.success("Valid JSON!")
         } catch(Exception e) {
             jsonSyntaxValidationTest.failure('JSON Syntax Error', e.toString())
-            throw new GradleException("JSON Syntax Error in ${resumeSource}:\n\n${e.toString()}")
         }
     }
 }
@@ -54,9 +53,7 @@ task('validateResume') {
         }
         if (output.toString().contains('INVALID')) {
             jsonSchemaValidationTest.failure('Validation Vailed', output.toString())
-            throw new GradleException("Resume validation has failed:\n\n${output.toString()}")
         } else {
-            println output.toString()
             jsonSchemaValidationTest.success(output.toString())
         }
     }
@@ -75,13 +72,9 @@ task('spellCheck') {
         }
         def errors = out.toString().readLines()
         if (errors.size() > 0) {
-            def message = "There were ${errors.size()} words misspelled in ${resumeSource}:\n\n${errors}"
-            spellCheckTest.failure('Mis-spelled Word', message)
-            throw new GradleException(message)
+            spellCheckTest.failure('Mis-spelled Word', "There were ${errors.size()} words misspelled in ${resumeSource}:\n\n${errors}")
         }
-        def message = "No spelling errors detected in ${resumeSource}"
-        spellCheckTest.success(message)
-        print message
+        spellCheckTest.success("No spelling errors detected in ${resumeSource}")
     }
 }
 
@@ -97,9 +90,7 @@ task('checkUrls') {
                 println "Found the URL ${detectedURL} in ${resumeSource} and it is currently a live link."
                 
             } catch(Exception e) {
-                def message = "Could not connect to the URL: ${detectedURL} \nFound in ${resumeSource}\n\n${e.toString()}"
-                resumeUrlCheckTest.failure('Bad URL Found', message)
-                throw new GradleException(message)
+                resumeUrlCheckTest.failure('Bad URL Found', "Could not connect to the URL: ${detectedURL} \nFound in ${resumeSource}\n\n${e.toString()}")
             }
         }
         resumeUrlCheckTest.success("All URLs found in ${resumeSource} are valid URLs and are currently responding:\n\n${URLs.join('\n')}")
@@ -151,11 +142,9 @@ task('analyzeResume') {
             def report = out.toString()
             file(buildDir).mkdirs()
             file("${buildDir}/resume-analysis.txt").text = report
-            println report
             resumeContentAnalysis.success(report)
         } catch(Exception e) {
             resumeContentAnalysis.failure('Error Generating Report', e.toString())
-            throw new GradleException(e.toString())
         }
     }
 }
@@ -225,9 +214,7 @@ task('postDeployCheck') {
         def content = deployURL.toURL().text
         ensureStrings.each { word ->
             if (!content.contains(word)) {
-                def message = "The ensure string \"${word}\" was not found in ${deployURL}"
-                ensureStringsTest.failure('Expected String Not Found', message)
-                throw new GradleException(message)
+                ensureStringsTest.failure('Expected String Not Found', "The ensure string \"${word}\" was not found in ${deployURL}")
             }
         }
         ensureStringsTest.success("Found all expected strings in deployed HTML resume at ${deployURL}:\n\n${ensureStrings.join('\n')}")
@@ -239,15 +226,10 @@ task('postDeployCheck') {
                 println "Found deployed ${format} resume at ${url}"                
                 urlList << url
             } catch(Exception e) {
-                def message = "The ${format} version of the resume could not be found at the deployed URL of ${url}\n\n${e.toString()}"
-                deployedResumeTest.failure('Deployed Resume Not Accessible', message)
-                throw new GradleException(message)
+                deployedResumeTest.failure('Deployed Resume Not Accessible', "The ${format} version of the resume could not be found at the deployed URL of ${url}\n\n${e.toString()}")
             }
         }
-        def message = "All resume formats have been deployed successfully and are currently web-accessible at the following URLs:\n\n${urlList.join('\n')}"
-
-        deployedResumeTest.success(message)
-        println "\nThe resume is confirmed to be published to ${deployURL} successfully, and can now be accessed at that URL.\n\nThe resume contains the following key strings we were looking for:\n\n${ensureStrings}\n"
+        deployedResumeTest.success("All resume formats have been deployed successfully and are currently web-accessible at the following URLs:\n\n${urlList.join('\n')}")
     }
 }
 
