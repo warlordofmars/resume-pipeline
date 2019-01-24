@@ -114,13 +114,10 @@ task('checkPrerequisites') {
 
 task('processTestResults') {
     doLast {
-        def inFile = file("${buildDir}/report.xml")
-        def xml = new XmlSlurper().parseText(inFile.text)
-
-        println xml.testsuite.size()
+        def reportFile = file("${buildDir}/report.xml")
+        def xml = new XmlSlurper().parseText(reportFile.text)
 
         xml.testsuite.each { testsuite ->
-
             
             testsuite.testcase.each { testcase ->
                 testResults.each { result ->
@@ -140,12 +137,13 @@ task('processTestResults') {
                     }
                 }
             }
-            
         }
 
-        inFile.withWriter { outWriter ->
+        reportFile.withWriter { outWriter ->
             XmlUtil.serialize(xml, outWriter)
         }
+
+        println "\nSaved generated test report file to: ${reportFile}"
     }
 }
 
@@ -177,9 +175,6 @@ class Test {
     }
 }
 
-// ext.cfnTemplateDeployedTest = new Test(cloudformationSource, 'Resume Website CloudFormation Template Deployed', project)
-// ext.cfnLintTest = new Test(cloudformationSource, 'Resume Website CloudF
-
 task('registerTests') {
     doFirst {
         
@@ -194,10 +189,8 @@ task('registerTests') {
                             testcase(classname: test[0], name: test[1]) {
                                 skipped()
                             }
-                        
                         }
                     }
-                    
                 }
             }
         }
