@@ -13,7 +13,7 @@ pipeline {
 
     stage('test') {
       steps {
-        sh './gradlew deploy -PpreviewHtmlFileName=resume-preview-${BUILD_NUMBER}.html'
+        sh './gradlew deploy'
         sh './gradlew print'
         input 'Deployed HTML + Print Preview Look Ok?'
       }
