@@ -17,6 +17,9 @@ pipeline {
     }
 
     stage('promote') {
+      environment {
+        PROMOTE = true
+      }
       when {
         branch 'master'
       }

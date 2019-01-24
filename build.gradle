@@ -24,63 +24,42 @@ plugins {
 project.version = scmVersion.version
 
 ext {
+
     cloudformationBucket = 'warlordofmars-cloudformation'
     testWebsiteUrl = 'resume-test.warlordofmars.net'
     prodWebsiteUrl = 'resume.warlordofmars.net'
+    domainName = 'warlordofmars.net'
+    wildcardCertARN = "arn:aws:acm:us-east-1:247631471946:certificate/471106fc-e3dd-4e0b-a20f-010a6e326283"
+    ensureStrings = ['John A. Carter', 'johncarter@warlordofmars.net', '(770) 598-7096']
+    
+
     testStackName = "ResumeWebsiteTest"
     prodStackName = 'ResumeWebsite'
     cloudformationSource = 'website.yaml'
-    domainName = 'warlordofmars.net'
-    wildcardCertARN = "arn:aws:acm:us-east-1:247631471946:certificate/471106fc-e3dd-4e0b-a20f-010a6e326283"
-    productionBranch = 'master'
-    ensureStrings = ['John A. Carter', 'johncarter@warlordofmars.net', '(770) 598-7096']
     resumeSource = 'resume.json'
     htmlResumeTheme = 'theme/node_modules/jsonresume-theme-class/'
     pdfResumeTheme = 'theme/node_modules/jsonresume-theme-short/'
     spellCheckIgnoreList = 'spell_check_ignore.txt'
     resumeFormats = ['html', 'pdf', 'yml', 'md']
     productionNumberOfCopies = 10
+
 }
 
-if (!project.hasProperty('previewHtmlFileName')) {
-    def random = new Random()
-    def randomNumber = random.nextInt() & Integer.MAX_VALUE
-    ext.previewHtmlFileName = "resume-preview-${randomNumber}.html"
-}
-
-if (!project.hasProperty('productionHtmlFileName')) {
-    ext.productionHtmlFileName = 'index.html'
-}
-
- def gitBranch() {
-    def branch = ""
-    def proc = "git rev-parse --abbrev-ref HEAD".execute()
-    proc.in.eachLine { line -> branch = line }
-    proc.err.eachLine { line -> println line }
-    proc.waitFor()
-    branch
-}
-
-def isProd() {
-    return (gitBranch() == productionBranch)
+def getPrefix() {
+    return ( System.env.containsKey('PROMOTE') ? '' : "${version}")
 }
 
 def getWebsiteUrl() {
-    return ( isProd() ? prodWebsiteUrl : testWebsiteUrl)
+    return ( System.env.containsKey('PROMOTE') ? prodWebsiteUrl : testWebsiteUrl)
 }
 
 def getStackName() {
-    return ( isProd() ? prodStackName : testStackName)
-}
-
-def getHtmlResumeName() {
-    return ( isProd() ? productionHtmlFileName : previewHtmlFileName)
+    return ( System.env.containsKey('PROMOTE') ? prodStackName : testStackName)
 }
 
 def getNumberOfCopies() {
-    return ( isProd() ? productionNumberOfCopies : 1 )
+    return ( System.env.containsKey('PROMOTE') ? productionNumberOfCopies : 1 )
 }
-
 
 ext.stackName = getStackName()
 ext.websiteUrl = getWebsiteUrl()
@@ -156,8 +135,6 @@ task('processTestResults') {
     }
 }
 
-
-
 class Test {
 
     String name
@@ -187,7 +164,9 @@ class Test {
         this.failureType = type
         throw new GradleException("${this.failureType}:\n${this.output}")
     }
+
 }
+
 
 task('registerTests') {
     doFirst {
@@ -214,6 +193,6 @@ task('registerTests') {
             file("${buildDir}").mkdirs()
             reportFile.write(sw.toString())
         }
+
     }
-    
 }
