@@ -10,7 +10,7 @@ pipeline {
         branch 'master'
       }
       steps {
-        sh './gradlew build'
+        sh './gradlew release'
       } 
     }
 

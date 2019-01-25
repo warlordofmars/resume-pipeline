@@ -330,7 +330,7 @@ task('postDeployCheck') {
 task('deploy') {
     dependsOn publishResumeToWeb, publishResumeToApple, publishResumeToGoogle, postDeployCheck    
     if(System.env.containsKey('PROMOTE')) {
-        dependsOn githubRelease
+        dependsOn tasks['githubRelease']
     }
 }
 
