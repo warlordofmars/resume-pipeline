@@ -13,10 +13,8 @@ githubRelease {
   token getProperty('github.token')
   owner rootProject.gitHubOwner
   repo rootProject.gitHubRepo
-  tagName "v${rootProject.version}"
+  tagName "release-${rootProject.version}"
   releaseName "v${rootProject.version}"
-  draft true
-  prerelease true
   overwrite true
   releaseAssets file("${buildDir}/resume.pdf") 
 }
