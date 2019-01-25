@@ -26,6 +26,12 @@ ext.tests = [
     resumeDeployedWebTest: [resumeSource, 'Deployed Resumes Are Web Accessible'],
     resumeDeployedGoogleTest: [resumeSource, 'Resume Deployed to Google Drive'],
     resumeDeployedAppleTest: [resumeSource, 'Resume Deployed to iCloud Drive'],
+    
+    ensureStringsProdTest: [resumeSource, 'Expected Strings Found in Deployed HTML Resume in Production'],
+    resumeDeployedWebProdTest: [resumeSource, 'Deployed Resumes Are Web Accessible in Production'],
+    resumeDeployedGoogleProdTest: [resumeSource, 'Resume Deployed to Google Drive in Production'],
+    resumeDeployedAppleProdTest: [resumeSource, 'Resume Deployed to iCloud Drive in Production'],
+    
     resumeContentAnalysis: [resumeSource, 'Resume Content Analysis'],
     resumeUrlCheckTest: [resumeSource, 'Resume URLs Validation'],
     spellCheckTest: [resumeSource, 'Resume Spell Check'],
@@ -281,14 +287,28 @@ task('postDeployCheck') {
     mustRunAfter publishResumeToWeb, publishResumeToGoogle, publishResumeToApple
     dependsOn rootProject.registerTests
     doFirst {
+
+        def ensureStringsTestObj = rootProject.ensureStringsTest
+        def resumeDeployedWebTestObj = resumeDeployedWebTest
+        def resumeDeployedGoogleTestObj = resumeDeployedGoogleTest
+        def resumeDeployedAppleTestObj = resumeDeployedAppleTest
+
+        if(System.env.containsKey('PROMOTE')) {
+            ensureStringsTestObj = rootProject.ensureStringsProdTest
+            resumeDeployedWebTestObj = resumeDeployedWebProdTest
+            resumeDeployedGoogleTestObj = resumeDeployedGoogleProdTest
+            resumeDeployedAppleTestObj = resumeDeployedAppleProdTest
+        }
+        
         def deployURL = "https://${getWebsiteUrl()}${getPrefix()}/"
         def content = deployURL.toURL().text
+        
         ensureStrings.each { word ->
             if (!content.contains(word)) {
-                ensureStringsTest.failure('Expected String Not Found', "The ensure string \"${word}\" was not found in ${deployURL}")
+                ensureStringsTestObj.failure('Expected String Not Found', "The ensure string \"${word}\" was not found in ${deployURL}")
             }
         }
-        ensureStringsTest.success("Found all expected strings in deployed HTML resume at ${deployURL}:\n\n${ensureStrings.join('\n')}")
+        ensureStringsTestObj.success("Found all expected strings in deployed HTML resume at ${deployURL}:\n\n${ensureStrings.join('\n')}")
         
         def urlList = []
         resumeFormats.each { format ->
@@ -298,10 +318,10 @@ task('postDeployCheck') {
                 println "Found deployed ${format} resume at ${url}"                
                 urlList << url
             } catch(Exception e) {
-                resumeDeployedWebTest.failure('Deployed Resume Not Accessible', "The ${format} version of the resume could not be found at the deployed URL of ${url}\n\n${e.toString()}")
+                resumeDeployedWebTestObj.failure('Deployed Resume Not Accessible', "The ${format} version of the resume could not be found at the deployed URL of ${url}\n\n${e.toString()}")
             }
         }
-        resumeDeployedWebTest.success("All resume formats have been deployed successfully and are currently web-accessible at the following URLs:\n\n${urlList.join('\n')}")
+        resumeDeployedWebTestObj.success("All resume formats have been deployed successfully and are currently web-accessible at the following URLs:\n\n${urlList.join('\n')}")
 
         def out = new ByteArrayOutputStream()
         exec {
@@ -310,16 +330,16 @@ task('postDeployCheck') {
         }
 
         if(out.toString().split(" ").size() > 1) {
-            resumeDeployedGoogleTest.success("resume.v${rootProject.version}.pdf is available in Google Drive")
+            resumeDeployedGoogleTestObj.success("resume.v${rootProject.version}.pdf is available in Google Drive")
         } else {
-            resumeDeployedGoogleTest.failure('Resume Not Found in Google Drive', "resume.v${rootProject.version}.pdf is not found in Google Drive")
+            resumeDeployedGoogleTestObj.failure('Resume Not Found in Google Drive', "resume.v${rootProject.version}.pdf is not found in Google Drive")
         }
 
 
         if(file("${iCloudLocalDir}/resume.v${rootProject.version}.pdf").exists()) {
-            resumeDeployedAppleTest.success("resume.v${rootProject.version}.pdf is available in iCloud Drive")
+            resumeDeployedAppleTestObj.success("resume.v${rootProject.version}.pdf is available in iCloud Drive")
         } else {
-            resumeDeployedAppleTest.failure('File Not Found', "resume.v${rootProject.version}.pdf was not found in iCloud Drive")
+            resumeDeployedAppleTestObj.failure('File Not Found', "resume.v${rootProject.version}.pdf was not found in iCloud Drive")
         }
         
     }
