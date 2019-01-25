@@ -29,6 +29,7 @@ plugins {
 project.version = scmVersion.version
 project.group = 'com.github.warlordofmars'
 
+scmVersion.repository.customUsername = getProperty('github.token')
 
 ext {
 
