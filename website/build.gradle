@@ -4,7 +4,8 @@ apply plugin: 'jp.classmethod.aws.cloudformation'
 
 
 ext.tests = [
-    cfnTemplateDeployedTest: [cloudformationSource, 'Resume Website CloudFormation Template Deployed'],
+    cfnTemplateDeployedTest: [cloudformationSource, 'Resume Website CloudFormation Stack Created / Updated Successfully '],
+    cfnTemplateDeployedProdTest: [cloudformationSource, 'Resume Website CloudFormation Stack Created / Updated Successfully in Production'],
     cfnLintTest: [cloudformationSource, 'Resume Website CloudFormation Linting / Syntax Check'],
     cfnNagTest: [cloudformationSource, 'Resume Website CloudFormation Best Practices'],
 ]
@@ -39,6 +40,12 @@ task('deploy') {
         def message = "cloudformation stack \"${stackDetails['StackName']}\" has status: \"${stackDetails['StackStatus']}\"\n\nstack created: \"${stackDetails['CreationTime']}\"\nstack last updated: \"${stackDetails['LastUpdatedTime']}\"\n\n"
         stackDetails['Outputs'].each { output ->
             message = message + "${output['OutputKey']}: \"${output['OutputValue']}\"\n"
+        }
+
+        def cfnTemplateDeployedTestObj = cfnTemplateDeployedTest
+
+        if(System.env.containsKey('PROMOTE')) {
+            cfnTemplateDeployedTestObj = cfnTemplateDeployedProdTest
         }
 
         if(stackDetails['StackStatus'] in ["CREATE_COMPLETE", "UPDATE_COMPLETE"]) {
