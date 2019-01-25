@@ -5,10 +5,13 @@ apply plugin: 'jp.classmethod.aws.cloudformation'
 
 ext.tests = [
     cfnTemplateDeployedTest: [cloudformationSource, 'Resume Website CloudFormation Stack Created / Updated Successfully '],
-    cfnTemplateDeployedProdTest: [cloudformationSource, 'Resume Website CloudFormation Stack Created / Updated Successfully in Production'],
     cfnLintTest: [cloudformationSource, 'Resume Website CloudFormation Linting / Syntax Check'],
     cfnNagTest: [cloudformationSource, 'Resume Website CloudFormation Best Practices'],
 ]
+
+if(System.env.containsKey('PROMOTE')) {
+    tests << [cfnTemplateDeployedProdTest: [cloudformationSource, 'Resume Website CloudFormation Stack Created / Updated Successfully in Production']]
+}
 
 cloudFormation {
     stackName "${rootProject.ext.stackName}"
@@ -49,9 +52,9 @@ task('deploy') {
         }
 
         if(stackDetails['StackStatus'] in ["CREATE_COMPLETE", "UPDATE_COMPLETE"]) {
-            cfnTemplateDeployedTest.success(message)
+            cfnTemplateDeployedTestObj.success(message)
         } else {
-            cfnTemplateDeployedTest.failure('CloudFormation Failed to Deploy', message)
+            cfnTemplateDeployedTestObj.failure('CloudFormation Failed to Deploy', message)
         }
         
     }

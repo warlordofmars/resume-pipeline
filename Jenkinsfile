@@ -23,7 +23,7 @@ pipeline {
     stage('test') {
       steps {
         sh './gradlew deploy'
-        sh './gradlew print'
+        // sh './gradlew print'
         input 'Deployed HTML + Print Preview Look Ok?'
       }
     }
@@ -37,7 +37,7 @@ pipeline {
       }
       steps {
         sh './gradlew deploy'
-        sh './gradlew print'
+        // sh './gradlew print'
       }
     }
 
