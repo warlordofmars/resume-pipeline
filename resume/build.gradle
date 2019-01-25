@@ -27,6 +27,11 @@ ext.tests = [
     resumeDeployedGoogleTest: [resumeSource, 'Resume Deployed to Google Drive'],
     resumeDeployedAppleTest: [resumeSource, 'Resume Deployed to iCloud Drive'],
     
+    ensureStringsProdTest: [resumeSource, 'Expected Strings Found in Deployed HTML Resume in Production'],
+    resumeDeployedWebProdTest: [resumeSource, 'Deployed Resumes Are Web Accessible in Production'],
+    resumeDeployedGoogleProdTest: [resumeSource, 'Resume Deployed to Google Drive in Production'],
+    resumeDeployedAppleProdTest: [resumeSource, 'Resume Deployed to iCloud Drive in Production'],
+    
     resumeContentAnalysis: [resumeSource, 'Resume Content Analysis'],
     resumeUrlCheckTest: [resumeSource, 'Resume URLs Validation'],
     spellCheckTest: [resumeSource, 'Resume Spell Check'],
@@ -37,10 +42,7 @@ ext.tests = [
 
 if(System.env.containsKey('PROMOTE')) {
     tests << [
-        ensureStringsProdTest: [resumeSource, 'Expected Strings Found in Deployed HTML Resume in Production'],
-        resumeDeployedWebProdTest: [resumeSource, 'Deployed Resumes Are Web Accessible in Production'],
-        resumeDeployedGoogleProdTest: [resumeSource, 'Resume Deployed to Google Drive in Production'],
-        resumeDeployedAppleProdTest: [resumeSource, 'Resume Deployed to iCloud Drive in Production'],
+        
     ]
 }
 
