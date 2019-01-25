@@ -10,7 +10,7 @@ pipeline {
         branch 'master'
       }
       steps {
-        sh './gradlew release'
+        sh './gradlew release -Prelease.disableChecks -Prelease.pushTagsOnly'
       } 
     }
 
