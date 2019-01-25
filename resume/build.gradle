@@ -40,12 +40,6 @@ ext.tests = [
 
 ]
 
-if(System.env.containsKey('PROMOTE')) {
-    tests << [
-        
-    ]
-}
-
 def iCloudLocalDir = "${System.env.HOME}/Library/Mobile Documents/com~apple~CloudDocs"
 
 
