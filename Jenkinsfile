@@ -5,6 +5,15 @@ pipeline {
   }
   stages {
 
+    stage('version') {
+      when {
+        branch 'master'
+      }
+      steps {
+        sh './gradlew build'
+      } 
+    }
+
     stage('build') {
       steps {
         sh './gradlew build'

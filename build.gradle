@@ -9,19 +9,26 @@ import groovy.xml.StreamingMarkupBuilder
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath "jp.classmethod.aws:gradle-aws-plugin:0.30"
         classpath "javax.xml.bind:jaxb-api:2.3.0"
+        classpath "com.squareup.okhttp3:okhttp:3.8.1"
+        classpath "org.zeroturnaround:zt-exec:1.10"
+        classpath "com.j256.simplemagic:simplemagic:1.10"
     }
 }
 
 plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.10.0'
+    
 }
 
 project.version = scmVersion.version
+project.group = 'com.github.warlordofmars'
+
 
 ext {
 
@@ -31,7 +38,8 @@ ext {
     domainName = 'warlordofmars.net'
     wildcardCertARN = "arn:aws:acm:us-east-1:247631471946:certificate/471106fc-e3dd-4e0b-a20f-010a6e326283"
     ensureStrings = ['John A. Carter', 'johncarter@warlordofmars.net', '(770) 598-7096']
-    
+    gitHubOwner = 'warlordofmars'
+    gitHubRepo = project.name
 
     testStackName = "ResumeWebsiteTest"
     prodStackName = 'ResumeWebsite'
