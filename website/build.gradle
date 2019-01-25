@@ -49,9 +49,9 @@ task('deploy') {
         }
 
         if(stackDetails['StackStatus'] in ["CREATE_COMPLETE", "UPDATE_COMPLETE"]) {
-            cfnTemplateDeployedTest.success(message)
+            cfnTemplateDeployedTestObj.success(message)
         } else {
-            cfnTemplateDeployedTest.failure('CloudFormation Failed to Deploy', message)
+            cfnTemplateDeployedTestObj.failure('CloudFormation Failed to Deploy', message)
         }
         
     }
