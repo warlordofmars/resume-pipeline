@@ -1,0 +1,15 @@
+
+rootProject.name = 'resume'
+
+import groovy.io.FileType
+
+def findAndIncludeSubProjects(File directory) {
+    directory.eachFile FileType.DIRECTORIES, {
+        if (new File("${it.name}/build.gradle").exists()) {
+            include it.name
+        }
+        findAndIncludeSubProjects(it)
+    }
+}
+
+findAndIncludeSubProjects(new File('.'))
