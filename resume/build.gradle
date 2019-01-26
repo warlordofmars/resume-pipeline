@@ -292,11 +292,14 @@ task('postDeployCheck') {
         def resumeDeployedGoogleTestObj = resumeDeployedGoogleTest
         def resumeDeployedAppleTestObj = resumeDeployedAppleTest
 
+        def resumeFileName = "resume.v${rootProject.version}.pdf"
+
         if(System.env.containsKey('PROMOTE')) {
             ensureStringsTestObj = rootProject.ensureStringsProdTest
             resumeDeployedWebTestObj = resumeDeployedWebProdTest
             resumeDeployedGoogleTestObj = resumeDeployedGoogleProdTest
             resumeDeployedAppleTestObj = resumeDeployedAppleProdTest
+            resumeFileName = 'resume.pdf'
         }
         
         def deployURL = "https://${getWebsiteUrl()}${getPrefix()}/"
@@ -324,21 +327,21 @@ task('postDeployCheck') {
 
         def out = new ByteArrayOutputStream()
         exec {
-            commandLine 'gdrive', 'list', '--no-header', '-q', "name = 'resume.v${rootProject.version}.pdf'"
+            commandLine 'gdrive', 'list', '--no-header', '-q', "name = '${resumeFileName}'"
             standardOutput out
         }
 
         if(out.toString().split(" ").size() > 1) {
-            resumeDeployedGoogleTestObj.success("resume.v${rootProject.version}.pdf is available in Google Drive")
+            resumeDeployedGoogleTestObj.success("${resumeFileName} is available in Google Drive")
         } else {
-            resumeDeployedGoogleTestObj.failure('Resume Not Found in Google Drive', "resume.v${rootProject.version}.pdf is not found in Google Drive")
+            resumeDeployedGoogleTestObj.failure('Resume Not Found in Google Drive', "${resumeFileName} is not found in Google Drive")
         }
 
 
         if(file("${iCloudLocalDir}/resume.v${rootProject.version}.pdf").exists()) {
-            resumeDeployedAppleTestObj.success("resume.v${rootProject.version}.pdf is available in iCloud Drive")
+            resumeDeployedAppleTestObj.success("${resumeFileName} is available in iCloud Drive")
         } else {
-            resumeDeployedAppleTestObj.failure('File Not Found', "resume.v${rootProject.version}.pdf was not found in iCloud Drive")
+            resumeDeployedAppleTestObj.failure('File Not Found', "${resumeFileName} was not found in iCloud Drive")
         }
         
     }
