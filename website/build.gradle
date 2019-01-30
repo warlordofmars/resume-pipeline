@@ -24,6 +24,7 @@ cloudFormation {
 
 
 task('deploy') {
+    description 'Deploy CloudFormation Template for Resume Website'
     dependsOn awsCfnMigrateStackAndWaitCompleted, rootProject.registerTests
     finalizedBy rootProject.processTestResults
     doLast {

@@ -10,7 +10,10 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
-        maven { url "https://plugins.gradle.org/m2/" }
+        maven { 
+            url "https://plugins.gradle.org/m2/" 
+            url "https://jitpack.io"
+        }
     }
     dependencies {
         classpath "jp.classmethod.aws:gradle-aws-plugin:0.30"
@@ -18,6 +21,8 @@ buildscript {
         classpath "com.squareup.okhttp3:okhttp:3.8.1"
         classpath "org.zeroturnaround:zt-exec:1.10"
         classpath "com.j256.simplemagic:simplemagic:1.10"
+        classpath 'com.github.Mindera:gradle-slack-plugin:1.0.7'
+        classpath "com.google.code.gson:gson:2.8.5"
     }
 }
 
@@ -25,6 +30,10 @@ plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.10.0'
     
 }
+
+apply plugin: 'com.mindera.gradle.slack'
+
+
 
 project.version = scmVersion.version
 project.group = 'com.github.warlordofmars'
@@ -104,6 +113,7 @@ task('checkPrerequisites') {
 }
 
 task('processTestResults') {
+    description 'Process all Test Results and Compile and XML Report'
     doLast {
         def reportFile = file("${buildDir}/report.xml")
         def xml = new XmlSlurper().parseText(reportFile.text)
@@ -205,4 +215,9 @@ task('registerTests') {
         }
 
     }
+}
+
+slack {
+    url getProperty('slack.webhook')
+    enabled true
 }
