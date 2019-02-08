@@ -1,111 +1,14 @@
-import groovy.json.JsonSlurper
 
-apply plugin: 'jp.classmethod.aws.cloudformation'
+apply plugin: 'com.github.warlordofmars.gradle.cloudformation'
 
-
-ext.tests = [
-    cfnTemplateDeployedTest: [cloudformationSource, 'Resume Website CloudFormation Stack Created / Updated Successfully '],
-    cfnTemplateDeployedProdTest: [cloudformationSource, 'Resume Website CloudFormation Stack Created / Updated Successfully in Production'],
-    cfnLintTest: [cloudformationSource, 'Resume Website CloudFormation Linting / Syntax Check'],
-    cfnNagTest: [cloudformationSource, 'Resume Website CloudFormation Best Practices'],
-]
-
-cloudFormation {
-    stackName "${rootProject.ext.stackName}"
-    templateFile file(cloudformationSource)
-    templateBucket cloudformationBucket
-    templateKeyPrefix stackName
-    stackParams ([
-        'DomainName': domainName,
-        'FullDomainName': websiteUrl,
-        'AcmCertificateArn': wildcardCertARN
-    ])
+cloudformation {
+    stackName = rootProject.stackName
+    templateFile = file(rootProject.cloudformationSource)
+    templateBucket = rootProject.cloudformationBucket
+    stackParams = [
+        DomainName: rootProject.domainName,
+        FullDomainName: rootProject.websiteUrl,
+        AcmCertificateArn: rootProject.wildcardCertARN
+    ]
+    isPromote = rootProject.isPromote
 }
-
-
-task('deploy') {
-    dependsOn awsCfnMigrateStackAndWaitCompleted, rootProject.registerTests
-    finalizedBy rootProject.processTestResults
-    doLast {
-
-        def out = new ByteArrayOutputStream()
-        exec {
-            commandLine 'aws', 'cloudformation', 'describe-stacks', '--stack-name', getStackName()
-            standardOutput out
-        }
-        
-        def stackDetails = new JsonSlurper().parseText(out.toString())['Stacks'][0]
-        
-
-        def message = "cloudformation stack \"${stackDetails['StackName']}\" has status: \"${stackDetails['StackStatus']}\"\n\nstack created: \"${stackDetails['CreationTime']}\"\nstack last updated: \"${stackDetails['LastUpdatedTime']}\"\n\n"
-        stackDetails['Outputs'].each { output ->
-            message = message + "${output['OutputKey']}: \"${output['OutputValue']}\"\n"
-        }
-
-        def cfnTemplateDeployedTestObj = cfnTemplateDeployedTest
-
-        if(System.env.containsKey('PROMOTE')) {
-            cfnTemplateDeployedTestObj = cfnTemplateDeployedProdTest
-        }
-
-        if(stackDetails['StackStatus'] in ["CREATE_COMPLETE", "UPDATE_COMPLETE"]) {
-            cfnTemplateDeployedTestObj.success(message)
-        } else {
-            cfnTemplateDeployedTestObj.failure('CloudFormation Failed to Deploy', message)
-        }
-        
-    }
-}
-
-awsCfnUploadTemplate.finalizedBy deploy
-awsCfnMigrateStack.finalizedBy deploy
-awsCfnWaitStackComplete.finalizedBy deploy
-awsCfnMigrateStackAndWaitCompleted.finalizedBy deploy
-
-task('delete') {
-    dependsOn awsCfnDeleteStackAndWaitCompleted
-}
-
-awsCfnMigrateStack.dependsOn awsCfnUploadTemplate
-
-task('cfnLint') {
-    dependsOn rootProject.checkPrerequisites, rootProject.registerTests
-    finalizedBy rootProject.processTestResults
-    doFirst {
-        def out = new ByteArrayOutputStream()
-        def result = exec {
-            commandLine 'cfn-lint', cloudformationSource
-            standardOutput out
-            ignoreExitValue true
-        }
-        if(result.getExitValue() == 0) {
-            cfnLintTest.success('All Checks Passed')
-        } else {
-            cfnLintTest.failure('CloudFormation Syntax Error', out.toString())
-        }
-    }
-}
-
-task('cfnNag') {
-    dependsOn rootProject.checkPrerequisites, rootProject.registerTests
-    finalizedBy rootProject.processTestResults
-    doFirst {
-        def out = new ByteArrayOutputStream()
-        def result = exec {
-            commandLine 'cfn_nag_scan', '--input-path', cloudformationSource
-            standardOutput out
-            ignoreExitValue true
-        }
-        if(result.getExitValue() == 0) {
-            cfnNagTest.success(out.toString())
-        } else {
-            cfnNagTest.failure('Not Adhering to CloudFormation Best Practices', out.toString())
-        }
-        
-    }
-}
-
-task('build') {
-    dependsOn cfnLint, cfnNag
-}
-
