@@ -1,9 +1,9 @@
 buildscript {
     dependencies {
         classpath 'com.github.warlordofmars:gradle-release-helper:release-0.1.3'
-        classpath 'com.github.warlordofmars:gradle-slack-liveupdate:release-0.3.4'
-        classpath 'com.github.warlordofmars:gradle-cloudformation-helper:release-0.1.4'
-        classpath 'com.github.warlordofmars:gradle-json-resume:release-0.1.0'
+        classpath 'com.github.warlordofmars:gradle-slack-liveupdate:release-0.3.8'
+        classpath 'com.github.warlordofmars:gradle-cloudformation-helper:release-0.1.6'
+        classpath 'com.github.warlordofmars:gradle-json-resume:release-0.1.1'
     }
 }
 
