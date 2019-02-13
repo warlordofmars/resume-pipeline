@@ -15,37 +15,31 @@ This project is a [Gradle Multi Project](https://docs.gradle.org/current/usergui
 | [resume/theme](resume/theme)             | JSON Resume Themes |
 | [resume/spell_check_ignore.txt](resume/spell_check_ignore.txt) | List of words to ignore during spell check
 | [website/website.yaml](website/website.yaml) | CloudFormation template which creates all resources required to build a CloudFront fronted website hosted in S3 |
+| [build.gradle](build.gradle) | Main build configuration for project
 
 
 
 ## Features
 
-* **Syntax/Schema Validation** - Resumé source is validated against normal JSON syntax rules, as well as the [JSON Resume Schema](https://jsonresume.org/schema/)
-* **Spell Check** - Resumé source is checked for any spelling errors.  Any unrecognized words can be added to an ignore list if necessary.
-* **URL Check** - Resumé source is parsed to find all instances of a valid URL.  Each URL is checked to confirm that the URL is still valid and currently responding
-* **Multi-Forrmat Build** - Resumé source can be compiled into a number of different output formats:  HTML, PDF, Markdown, YAML
-* **Custom Resumé Themes** - Each configured output format can be configured to use a custom [JSON Resume Theme](https://jsonresume.org/themes/)
-* **Resumé Deployment** - Resumé will be deployed to several locations for ultimate consumpton:
-  * **Web** - Resumé is published to a static website hosted in AWS S3
-  * **Google Drive** - Resumé is published to a Google Drive document
-  * **iCloud** - Resumé is published to a iCloud Drive document
-  * **Print** - Resumé is printed using a local printer
-
-* **Syntax Validation** - CloudFormation template syntax is checked against CloudFormation specifications.  All resources defined are check to make sure the match what CloudFormation is expecting.
-* **Best Practices Check** - CloudFormation template is analyzed for any deviation from CloudFormation best practices
-* **Stack Deployment** -CloudFormation stack deployed from CloudFormation template
-
-* **Test Results** - All tests that are performed throughout the `build` and `deploy` process are captured and recorded in a JUnit-style XML report.
-
-  ![Test Results Report](https://i.imgur.com/2e8GdDF.png)
-
-* **Jenkins Pipeline** - All builds orchestrated by Jenkins pipeline
-
-  ![Simple Pipeline](https://i.imgur.com/ZaVIgzy.png)
-
-* **Realtime Slack Updates** - All builds executed in Jenkins will update Slack along the way as the build progresses.
-
-  ![slack screenshot](https://i.imgur.com/AmrJprI.gif)
+| Feature | Details |
+|---------|---------|
+| **Syntax/Schema Validation** | Resumé source is validated against normal JSON syntax rules, as well as the [JSON Resume Schema](https://jsonresume.org/schema/) |
+| **Spell Check** | Resumé source is checked for any spelling errors.  Any unrecognized words can be added to an ignore list if necessary.
+| **URL Check** | Resumé source is parsed to find all instances of a valid URL.  Each URL is checked to confirm that the URL is still valid and currently responding
+| **Resumé Content Analysis** | Keyword count from resume and gap analysis
+| **Multi-Forrmat Build** | Resumé source can be compiled into a number of different output formats:  HTML, PDF, Markdown, YAML
+| **Custom Resumé Themes** | Each configured output format can be configured to use a custom [JSON Resume Theme](https://jsonresume.org/themes/)
+| **Resumé Deployment** | Resumé will be deployed to several locations for ultimate consumpton:
+| **Resumé Deployment - Web** | Resumé is published to a static website hosted in AWS S3
+| **Resumé Deployment - Google Drive** | Resumé is published to a Google Drive document
+| **Resumé Deployment - iCloud** | Resumé is published to a iCloud Drive document
+| **Resumé Deployment - Print** | Resumé is printed using a local printer
+| **Syntax Validation** | CloudFormation template syntax is checked against CloudFormation specifications.  All resources defined are check to make sure the match what CloudFormation is expecting.
+| **Best Practices Check** | CloudFormation template is analyzed for any deviation from CloudFormation best practices
+| **Stack Deployment** | CloudFormation stack deployed from CloudFormation template
+| **Test Results** | All tests that are performed throughout the `build` and `deploy` process are captured and recorded in a JUnit-style XML report.<br/><br/>![Test Results Report](https://i.imgur.com/2e8GdDF.png) |
+| **Jenkins Pipeline** | All builds orchestrated by Jenkins pipeline <br/><br/>![Simple Pipeline](https://i.imgur.com/ZaVIgzy.png)
+| **Realtime Slack Updates** | All builds executed in Jenkins will update Slack along the way as the build progresses. <br/><br/> ![slack screenshot](https://i.imgur.com/AmrJprI.gif)
 
 ## Configuration
 
