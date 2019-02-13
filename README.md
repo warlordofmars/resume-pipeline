@@ -29,14 +29,10 @@ This project is a [Gradle Multi Project](https://docs.gradle.org/current/usergui
 | **Resumé Content Analysis** | Keyword count from resume and gap analysis
 | **Multi-Forrmat Build** | Resumé source can be compiled into a number of different output formats:  HTML, PDF, Markdown, YAML
 | **Custom Resumé Themes** | Each configured output format can be configured to use a custom [JSON Resume Theme](https://jsonresume.org/themes/)
-| **Resumé Deployment** | Resumé will be deployed to several locations for ultimate consumpton:
-| **Resumé Deployment - Web** | Resumé is published to a static website hosted in AWS S3
-| **Resumé Deployment - Google Drive** | Resumé is published to a Google Drive document
-| **Resumé Deployment - iCloud** | Resumé is published to a iCloud Drive document
-| **Resumé Deployment - Print** | Resumé is printed using a local printer
-| **Syntax Validation** | CloudFormation template syntax is checked against CloudFormation specifications.  All resources defined are check to make sure the match what CloudFormation is expecting.
-| **Best Practices Check** | CloudFormation template is analyzed for any deviation from CloudFormation best practices
-| **Stack Deployment** | CloudFormation stack deployed from CloudFormation template
+| **Resumé Deployment** | Resumé will be deployed to several locations for ultimate consumpton: <br/><ul><li>**Web** -  Resumé is published to a static website hosted in AWS S3</li><li>**Google Drive** - Resumé is published to a Google Drive document</li><li>**iCloud** - Resumé is published to a iCloud Drive document</li><li>**Print** - Resumé is printed using a local printer</li>
+| **CloudFormation Syntax Validation** | CloudFormation template syntax is checked against CloudFormation specifications.  All resources defined are check to make sure the match what CloudFormation is expecting.
+| **CloudFormation Best Practices Check** | CloudFormation template is analyzed for any deviation from CloudFormation best practices
+| **CloudFormation Stack Deployment** | CloudFormation stack deployed from CloudFormation template
 | **Test Results** | All tests that are performed throughout the `build` and `deploy` process are captured and recorded in a JUnit-style XML report.<br/><br/>![Test Results Report](https://i.imgur.com/2e8GdDF.png) |
 | **Jenkins Pipeline** | All builds orchestrated by Jenkins pipeline <br/><br/>![Simple Pipeline](https://i.imgur.com/ZaVIgzy.png)
 | **Realtime Slack Updates** | All builds executed in Jenkins will update Slack along the way as the build progresses. <br/><br/> ![slack screenshot](https://i.imgur.com/AmrJprI.gif)
