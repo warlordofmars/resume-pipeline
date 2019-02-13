@@ -9,21 +9,14 @@ A full CI/CD pipeline to aide in the creation, publishing and delivery of the re
 
 This project is a [Gradle Multi Project](https://docs.gradle.org/current/userguide/multi_project_builds.html).  There are two sub-projects that make up the components of this project:
 
-### Resumé
+| Source File                              | Description        |
+|------------------------------------------|---------------------
+| [resume/resume.json](resume/resume.json) | JSON Resume Source |
+| [resume/theme](resume/theme)             | JSON Resume Themes |
+| [resume/spell_check_ignore.txt](resume/spell_check_ignore.txt) | List of words to ignore during spell check
+| [website/website.yaml](website/website.yaml) | CloudFormation template which creates all resources required to build a CloudFront fronted website hosted in S3 |
 
-The [resume](resume) project contains everything required to make the actual resumé artifact itself.  This includes both:
 
-#### JSON Resumé Source
-
-The JSON Resume sources is defined at [resume/resume.json](resume/resume.json)
-
-#### Resumé Themes
-
-The JSON Resume themes are defined at [resume/theme](resume/theme)
-
-### Resumé Website
-
-This project contains a CloudFormation template which creates all resources required to build a CloudFront fronted website hosted in S3 located at [website/website.yaml](website/website.yaml)
 
 ## Features
 
@@ -43,12 +36,15 @@ This project contains a CloudFormation template which creates all resources requ
 * **Stack Deployment** -CloudFormation stack deployed from CloudFormation template
 
 * **Test Results** - All tests that are performed throughout the `build` and `deploy` process are captured and recorded in a JUnit-style XML report.
+
   ![Test Results Report](https://i.imgur.com/2e8GdDF.png)
 
-* **Jenkins Pipeline** -
+* **Jenkins Pipeline** - All builds orchestrated by Jenkins pipeline
+
   ![Simple Pipeline](https://i.imgur.com/ZaVIgzy.png)
 
-* **Realtime Slack Updates** -
+* **Realtime Slack Updates** - All builds executed in Jenkins will update Slack along the way as the build progresses.
+
   ![slack screenshot](https://i.imgur.com/AmrJprI.gif)
 
 ## Configuration
