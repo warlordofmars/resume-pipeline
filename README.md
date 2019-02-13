@@ -27,7 +27,7 @@ This project is a [Gradle Multi Project](https://docs.gradle.org/current/usergui
 | **Spell Check** | Resumé source is checked for any spelling errors.  Any unrecognized words can be added to an ignore list if necessary.
 | **URL Check** | Resumé source is parsed to find all instances of a valid URL.  Each URL is checked to confirm that the URL is still valid and currently responding
 | **Resumé Content Analysis** | Keyword count from resume and gap analysis
-| **Multi-Forrmat Build** | Resumé source can be compiled into a number of different output formats:  HTML, PDF, Markdown, YAML
+| **Multi-Format Build** | Resumé source can be compiled into a number of different output formats:  HTML, PDF, Markdown, YAML
 | **Custom Resumé Themes** | Each configured output format can be configured to use a custom [JSON Resume Theme](https://jsonresume.org/themes/)
 | **Resumé Deployment** | Resumé will be deployed to several locations for ultimate consumpton: <br/><br/><ul><li>**Web** -  Resumé is published to a static website hosted in AWS S3</li><li>**Google Drive** - Resumé is published to a Google Drive document</li><li>**iCloud** - Resumé is published to a iCloud Drive document</li><li>**Print** - Resumé is printed using a local printer</li>
 | **CloudFormation Syntax Validation** | CloudFormation template syntax is checked against CloudFormation specifications.  All resources defined are check to make sure the match what CloudFormation is expecting.
