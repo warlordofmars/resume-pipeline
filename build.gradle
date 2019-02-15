@@ -15,6 +15,7 @@ apply plugin: 'com.github.warlordofmars.gradle.slack'
 slack {
     channel 'jenkins'
     token getProperty('slack.token')
+    enabled git.branch.current.name == 'master'
 }
 
 ext {
@@ -24,13 +25,14 @@ ext {
     cloudformationBucket = 'warlordofmars-cloudformation'
     domainName = 'warlordofmars.net'
     wildcardCertARN = "arn:aws:acm:us-east-1:247631471946:certificate/471106fc-e3dd-4e0b-a20f-010a6e326283"
-    ensureStrings = ['John A. Carter', 'johncarter@warlordofmars.net', '(770) 598-7096']
+    ensureStrings = ['John A. Carter', 'johncarter@warlordofmars.net', '(617) 334-5110']
     stackName = isPromote ? 'ResumeWebsite' : 'ResumeWebsiteTest'
     cloudformationSource = 'website.yaml'
     
     resumeSource = 'resume.json'
     themes = [
-        html: 'theme/node_modules/jsonresume-theme-class/',
+        // html: 'theme/node_modules/jsonresume-theme-class/',
+        html: 'theme/node_modules/jsonresume-theme-short/',
         pdf: 'theme/node_modules/jsonresume-theme-short/',
     ]
     spellCheckIgnoreList = 'spell_check_ignore.txt'

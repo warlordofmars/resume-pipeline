@@ -98,8 +98,8 @@ slack {
     // retrieve slack API token from gradle properties
     token getProperty('slack.token')
 
-    // only send slack updates during promote
-    enabled isPromote
+    // only send slack updates when building on master branch
+    enabled git.branch.current.name == 'master'
 }
 ```
 
