@@ -34,7 +34,7 @@ This project is a [Gradle Multi Project](https://docs.gradle.org/current/usergui
 | **CloudFormation Best Practices Check** | CloudFormation template is analyzed for any deviation from CloudFormation best practices
 | **CloudFormation Stack Deployment** | CloudFormation stack deployed from CloudFormation template
 | **Test Results** | All tests that are performed throughout the `build` and `deploy` process are captured and recorded in a JUnit-style XML report.<br/><br/>![Test Results Report](https://i.imgur.com/2e8GdDF.png) |
-| **Jenkins Pipeline** | All builds orchestrated by Jenkins pipeline <br/><br/>![Simple Pipeline](https://i.imgur.com/ZaVIgzy.png)
+| **Jenkins Pipeline** | All builds orchestrated by Jenkins pipeline <br/><br/>![Simple Pipeline](https://i.imgur.com/ZaVIgzy.png) <br/><br/> With gating approval step ![Pipeline Waiting for Input](https://i.imgur.com/CgBIZ5v.png)
 | **Realtime Slack Updates** | All builds executed in Jenkins will update Slack along the way as the build progresses. <br/><br/> ![slack screenshot](https://i.imgur.com/AmrJprI.gif)
 
 ## Configuration

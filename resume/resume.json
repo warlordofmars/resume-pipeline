@@ -229,6 +229,7 @@
             "yum",
             "Jenkins",
             "Jenkins Pipeline",
+            "Jenkins Job DSL",
             "Maven",
             "Artifactory",
             "Ant"
@@ -330,6 +331,7 @@
         "keywords": [
             "AWS EC2",
             "AWS EC2 Auto Scaling Groups",
+            "VirtualBox",
             "VMware vSphere",
             "Citrix XenServer"
             
@@ -435,6 +437,7 @@
             "Stash/BitBucket",
             "Jira",
             "Confluence",
+            "LastPass",
             "Office365",
             "ServiceNow",
             "PagerDuty"
