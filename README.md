@@ -103,6 +103,15 @@ slack {
 }
 ```
 
+## Downloads
+
+* **HTML** - [https://resume.warlordofmars.net](https://resume.warlordofmars.net)
+* **PDF**
+  * [Web](https://resume.warlordofmars.net/resume.pdf)
+  * [Google Drive](https://drive.google.com/file/d/1Sgn4IoOrR0DB8tHuR-s0YLd8zhjnFmrl/view?usp=sharing)
+  * [iCloud Drive](https://www.icloud.com/iclouddrive/0XmGbODuHFZbt-kAjLhmLnGnw#resume)
+  * [GitHub](https://github.com/warlordofmars/resume-pipeline/releases/latest)
+
 ## Versioning
 
 Versioning on this project is applied automatically on all changes using the [axion-release-plugin](https://github.com/allegro/axion-release-plugin).  Git tags are created for all released versions, and all available released versions can be viewed in the [Releases](https://github.com/warlordofmars/gradle-json-resume/releases) section of this project.
