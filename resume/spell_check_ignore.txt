@@ -136,3 +136,5 @@ underperforming
 balancer
 EFS
 gR
+VirtualBox
+natively
