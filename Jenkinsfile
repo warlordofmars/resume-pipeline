@@ -12,7 +12,7 @@ simplePipelineWithInput(
   'resume-builder',
 
   // docker builder args
-  "'-v', '${System.env['HOME']}/.m2:/home/gradle/.m2', '-v', '${System.env['HOME']}/.aws:/home/gradle/.aws', '-v', '${System.env['HOME']}/.gradle:/home/gradle/.gradle', '-v', '${workspace}:/home/gradle/src'"
+  "-v ${env.HOME}/.m2:/home/gradle/.m2 -v '${env.HOME}/.aws:/home/gradle/.aws -v ${env.HOME}/.gradle:/home/gradle/.gradle -v ${env.WORKSPACE}:/home/gradle/src"
 
   
 )
