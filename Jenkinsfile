@@ -9,7 +9,7 @@ simplePipelineWithInput(
   'resume/build/resume*',
 
   // docker builder args
-  '-u gradle -v $HOME/.m2:/home/gradle/.m2 -v $HOME/.aws:/home/gradle/.aws -v $HOME/.gradle/gradle.properties:/home/gradle/.gradle/gradle.properties'
+  '-u gradle -v $HOME/Library/Mobile\ Documents/com~apple~CloudDocs:/home/gradle/Library/Mobile\ Documents/com~apple~CloudDocs -v $HOME/.gdrive:/home/gradle/.gdrive -v $HOME/.m2:/home/gradle/.m2 -v $HOME/.aws:/home/gradle/.aws -v $HOME/.gradle/gradle.properties:/home/gradle/.gradle/gradle.properties'
 
   
 )
