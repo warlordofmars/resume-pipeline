@@ -9,7 +9,7 @@ simplePipelineWithInput(
   'resume/build/resume*',
 
   // docker builder args
-  '-u gradle -v $HOME/.m2:/home/gradle/.m2 -v $HOME/.aws:/home/gradle/.aws -v $HOME/.gradle:/home/gradle/.gradle'
+  '-u gradle -v $HOME/.m2:/home/gradle/.m2 -v $HOME/.aws:/home/gradle/.aws -v $HOME/.gradle/gradle.properties:/home/gradle/.gradle/gradle.properties'
 
   
 )
