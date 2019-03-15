@@ -9,7 +9,24 @@ simplePipelineWithInput(
   'resume/build/resume*',
 
   // docker builder args
-  '-u gradle -v $HOME/.credentials/google-drive-uploader:/home/gradle/.credentials/google-drive-uploader -v "$HOME/Library/Mobile Documents/com~apple~CloudDocs:/home/gradle/Library/Mobile Documents/com~apple~CloudDocs" -v $HOME/.gdrive:/home/gradle/.gdrive -v $HOME/.m2:/home/gradle/.m2 -v $HOME/.aws:/home/gradle/.aws -v $HOME/.gradle/gradle.properties:/home/gradle/.gradle/gradle.properties'
-
   
+  // un-privileged user 
+  '-u gradle ' + \
+
+  // saved credentials for google drive publish
+  '-v $HOME/.credentials/google-drive-uploader:/home/gradle/.credentials/google-drive-uploader ' + \
+  
+  // local icloud dir for icloud drive publish
+  '-v "$HOME/Library/Mobile Documents/com~apple~CloudDocs:/home/gradle/Library/Mobile Documents/com~apple~CloudDocs" ' + \
+  
+  // TODO: remove this
+  // local maven repo for testing SNAPSHOT versions
+  '-v $HOME/.m2:/home/gradle/.m2 ' + \
+
+  // local AWS config and credentials
+  '-v $HOME/.aws:/home/gradle/.aws ' + \
+
+  // local gradle.properties
+  '-v $HOME/.gradle/gradle.properties:/home/gradle/.gradle/gradle.properties'
+
 )
