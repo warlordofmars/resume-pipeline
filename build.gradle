@@ -3,7 +3,7 @@ buildscript {
         classpath 'com.github.warlordofmars:gradle-release-helper:release-0.1.3'
         classpath 'com.github.warlordofmars:gradle-slack-liveupdate:release-0.3.8'
         classpath 'com.github.warlordofmars:gradle-cloudformation-helper:release-0.1.6'
-        classpath 'com.github.warlordofmars:gradle-json-resume:0.1.9'
+        classpath 'com.github.warlordofmars:gradle-json-resume:release-0.1.11'
     }
 }
 
@@ -42,30 +42,4 @@ ext {
     websiteUrl = isPromote ? 'resume.warlordofmars.net' : 'resume-test.warlordofmars.net'
     websitePrefix = isPromote ? '' : "/${version}"
 
-}
-
-task('dockerBuild') {
-    doLast {
-        exec {
-            commandLine 'docker', 'build', '-t', 'resume-builder', '.'
-        }
-    }
-}
-
-task('containedBuild') {
-    dependsOn dockerBuild
-    doLast {
-        exec {
-            commandLine 'docker', 'run', '-v', "${System.env['HOME']}/.m2:/home/gradle/.m2", '-v', "${System.env['HOME']}/.aws:/home/gradle/.aws", '-v', "${System.env['HOME']}/.gradle:/home/gradle/.gradle", '-v', "${projectDir}:/home/gradle/src", 'resume-builder', 'sh', '-c', './gradlew build'
-        }
-    }
-}
-
-task('containedDeploy') {
-    mustRunAfter containedBuild
-    doLast {
-        exec {
-            commandLine 'docker', 'run', '-v', "${System.env['HOME']}/.m2:/home/gradle/.m2", '-v', "${System.env.HOME}/Library/Mobile Documents/com~apple~CloudDocs:/home/gradle/Library/Mobile Documents/com~apple~CloudDocs", '-v', "${System.env['HOME']}/.gdrive:/home/gradle/.gdrive", '-v', "${System.env['HOME']}/.aws:/home/gradle/.aws", '-v', "${System.env['HOME']}/.gradle:/home/gradle/.gradle", '-v', "${projectDir}:/home/gradle/src", 'resume-builder', 'sh', '-c', './gradlew deploy'
-        }
-    }
 }
