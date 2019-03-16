@@ -19,10 +19,6 @@ simplePipelineWithInput(
   // local icloud dir for icloud drive publish
   '-v "$HOME/Library/Mobile Documents/com~apple~CloudDocs:/home/gradle/Library/Mobile Documents/com~apple~CloudDocs" ' + \
   
-  // TODO: remove this
-  // local maven repo for testing SNAPSHOT versions
-  '-v $HOME/.m2:/home/gradle/.m2 ' + \
-
   // local AWS config and credentials
   '-v $HOME/.aws:/home/gradle/.aws ' + \
 
