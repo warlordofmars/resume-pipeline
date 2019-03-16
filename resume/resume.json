@@ -15,6 +15,17 @@
   },
   "work": [
     {
+        "company": "Nasuni",
+        "position": "Principal DevOps Engineer",
+        "website": "https://nasuni.com",
+        "startDate": "2019-03-18",
+        "location": "Boston, MA",
+        "summary": "DevOps on Cloud Services team",
+        "highlights": [
+            "Cool things."
+        ]
+    },  
+    {
         "company": "Cogito",
         "position": "Principal DevOps Engineer",
         "website": "http://cogitocorp.com",
