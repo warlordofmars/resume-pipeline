@@ -57,7 +57,7 @@ ext {
     wildcardCertARN = "arn:aws:acm:us-east-1:247631471946:certificate/471106fc-e3dd-4e0b-a20f-010a6e326283"
 
     // list of strings to check for in postdeploy check of deployed html resume
-    ensureStrings = ['John A. Carter', 'johncarter@warlordofmars.net', '(770) 598-7096']
+    ensureStrings = ['John A. Carter', 'johncarter@warlordofmars.net', '(617) 334-5110']
 
     // set stack name different if not promote
     stackName = isPromote ? 'ResumeWebsite' : 'ResumeWebsiteTest'
